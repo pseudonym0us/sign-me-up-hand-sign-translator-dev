@@ -91,6 +91,22 @@ let sequenceStep = -1;
 let sentenceHistory = []; 
 let lastTypeWasLetter = false;
 
+function getLastEntry() {
+    if (sentenceHistory.length === 0) return null;
+    return sentenceHistory[sentenceHistory.length - 1].en;
+}
+
+function removeLastEntry() {
+    if (sentenceHistory.length > 0) {
+        sentenceHistory.pop();
+        if (sentenceHistory.length > 0) {
+            lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
+        } else {
+            lastTypeWasLetter = false;
+        }
+    }
+}
+
 // --- INITIALIZATION ---
 async function init() {
     await loadModel();
@@ -261,11 +277,7 @@ function handleLogic(predictedLabel, confidence) {
     updateConfidenceBar(confidence);
 
     let malayText = malay_mapping[predictedLabel] || predictedLabel;
-    
-    predictionDisplay.innerHTML = `
-        <span>${predictedLabel}</span>
-        <span class="malay-text">${malayText}</span>
-    `;
+    predictionDisplay.innerHTML = `<span>${predictedLabel}</span><span class="malay-text">${malayText}</span>`;
 
     if (predictedLabel === previousPrediction) {
         consecutiveFrames++;
@@ -289,49 +301,38 @@ function handleLogic(predictedLabel, confidence) {
                 sequenceStep = -1;
                 currentSequenceBase = null;
                 lastPrintedChar = baseName;
-                lastValidEntry = baseName;
-                wasLastHidden = false;
             }
         } else {
             currentSequenceBase = null;
             sequenceStep = -1;
 
             if (predictedLabel !== lastPrintedChar) {
-                if (hidden_signs.has(predictedLabel)) {
-                    lastValidEntry = predictedLabel;
-                    wasLastHidden = true;
-                    lastPrintedChar = predictedLabel;
-                } else {
+                if (!hidden_signs.has(predictedLabel)) {
+                    
                     let shouldPrint = true;
-                    let isModifierReplace = false;
-
+                    
                     if (modifiers[predictedLabel]) {
-                        if (lastValidEntry === modifiers[predictedLabel]) isModifierReplace = true;
-                        else shouldPrint = false;
+                        let required = modifiers[predictedLabel];
+                        let lastEntry = getLastEntry(); 
+                        
+                        if (lastEntry !== required) {
+                            shouldPrint = false;
+                        } else {
+                            removeLastEntry();
+                        }
                     }
 
                     if (shouldPrint) {
-                        let comboKey = lastValidEntry + "|" + predictedLabel;
+                        let lastEntry = getLastEntry();
+                        let comboKey = lastEntry + "|" + predictedLabel;
+                        
                         if (activators[comboKey]) {
-                            let newWord = activators[comboKey];
-                            if (!wasLastHidden) {
-                                removeSpecificEntry(lastValidEntry); 
-                            }
-                            addToSentence(newWord);
-                            lastValidEntry = newWord;
-                            wasLastHidden = false;
-                        } else if (isModifierReplace) {
-                            if (!wasLastHidden) {
-                                removeSpecificEntry(lastValidEntry);
-                            }
-                            addToSentence(predictedLabel);
-                            lastValidEntry = predictedLabel;
-                            wasLastHidden = false;
+                            removeLastEntry();
+                            addToSentence(activators[comboKey]);
                         } else {
                             addToSentence(predictedLabel);
-                            lastValidEntry = predictedLabel;
-                            wasLastHidden = false;
                         }
+                        
                         lastPrintedChar = predictedLabel;
                     }
                 }
