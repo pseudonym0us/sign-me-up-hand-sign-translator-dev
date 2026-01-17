@@ -152,7 +152,8 @@ function startCamera() {
         onFrame: async () => {
             await hands.send({image: videoElement});
         },
-        width: 640, height: 480
+        width: { ideal: 1280 }, 
+        height: { ideal: 720 } 
     });
 
     camera.start().then(() => {
@@ -176,8 +177,17 @@ hands.setOptions({maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.
 hands.onResults(onResults);
 
 function onResults(results) {
+    const videoWidth = results.image.width;
+    const videoHeight = results.image.height;
+
+    if (canvasElement.width !== videoWidth || canvasElement.height !== videoHeight) {
+        canvasElement.width = videoWidth;
+        canvasElement.height = videoHeight;
+    }
+
     ctx.save();
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
     ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
