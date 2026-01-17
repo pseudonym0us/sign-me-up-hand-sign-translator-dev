@@ -194,7 +194,7 @@ function onResults(results) {
         
         for (const landmarks of results.multiHandLandmarks) {
             drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
-            drawLandmarks(ctx, landmarks, {color: '#FF4B4B', lineWidth: 2});
+            drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
         }
 
         let dataAux = [];
