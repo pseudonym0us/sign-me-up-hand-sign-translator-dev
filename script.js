@@ -305,38 +305,68 @@ function handleLogic(predictedLabel, confidence) {
                 sequenceStep = -1;
                 currentSequenceBase = null;
                 lastPrintedChar = baseName;
+                lastValidEntry = baseName;
+                wasLastHidden = false;
             }
         } else {
             currentSequenceBase = null;
             sequenceStep = -1;
 
             if (predictedLabel !== lastPrintedChar) {
-                if (!hidden_signs.has(predictedLabel)) {
-                    
+                
+                if (hidden_signs.has(predictedLabel)) {
+                    lastValidEntry = predictedLabel;
+                    wasLastHidden = true;
+                    lastPrintedChar = predictedLabel;
+                } else {
                     let shouldPrint = true;
-                    
+                    let isModifierReplace = false;
+
                     if (modifiers[predictedLabel]) {
                         let required = modifiers[predictedLabel];
-                        let lastEntry = getLastEntry(); 
                         
-                        if (lastEntry !== required) {
-                            shouldPrint = false;
-                        } else {
-                            removeLastEntry();
+                        if (required.length === 1) {
+                            if (sentenceHistory.length > 0) {
+                                let lastItem = sentenceHistory[sentenceHistory.length - 1];
+                                if (lastItem.isLetter && lastItem.en.toUpperCase().endsWith(required)) {
+                                    isModifierReplace = true;
+                                } else {
+                                    shouldPrint = false;
+                                }
+                            } else {
+                                shouldPrint = false;
+                            }
+                        } 
+                        else {
+                            if (lastValidEntry === required) {
+                                isModifierReplace = true;
+                            } else {
+                                shouldPrint = false;
+                            }
                         }
                     }
 
                     if (shouldPrint) {
-                        let lastEntry = getLastEntry();
-                        let comboKey = lastEntry + "|" + predictedLabel;
+                        let comboKey = lastValidEntry + "|" + predictedLabel;
                         
                         if (activators[comboKey]) {
-                            removeLastEntry();
-                            addToSentence(activators[comboKey]);
-                        } else {
+                            let newWord = activators[comboKey];
+                            removeLastSign(); 
+                            addToSentence(newWord);
+                            lastValidEntry = newWord;
+                            wasLastHidden = false;
+                        } 
+                        else if (isModifierReplace) {
+                            removeLastSign(); 
+                            addToSentence(predictedLabel); 
+                            lastValidEntry = predictedLabel;
+                            wasLastHidden = false;
+                        } 
+                        else {
                             addToSentence(predictedLabel);
+                            lastValidEntry = predictedLabel;
+                            wasLastHidden = false;
                         }
-                        
                         lastPrintedChar = predictedLabel;
                     }
                 }
