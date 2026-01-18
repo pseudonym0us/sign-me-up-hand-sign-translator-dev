@@ -195,7 +195,6 @@ hands.onResults(onResults);
 function onResults(results) {
     const videoWidth = results.image.width;
     const videoHeight = results.image.height;
-
     if (canvasElement.width !== videoWidth || canvasElement.height !== videoHeight) {
         canvasElement.width = videoWidth;
         canvasElement.height = videoHeight;
@@ -203,7 +202,6 @@ function onResults(results) {
 
     ctx.save();
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    
     ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
@@ -218,12 +216,15 @@ function onResults(results) {
         let y_ = [];
 
         for (const landmarks of results.multiHandLandmarks) {
+            
             for (let lm of landmarks) {
                 x_.push(lm.x);
                 y_.push(lm.y);
             }
+
             let minX = Math.min(...x_);
             let minY = Math.min(...y_);
+
             for (let lm of landmarks) {
                 dataAux.push(lm.x - minX);
                 dataAux.push(lm.y - minY);
@@ -234,7 +235,10 @@ function onResults(results) {
             dataAux.push(0.0);
         }
 
-        runInference(dataAux);
+        const inputFeatures = dataAux.slice(0, 84);
+
+        runInference(inputFeatures);
+
     } else {
         handleNoHand();
     }
