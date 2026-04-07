@@ -1,131 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Me Up | AI Translator</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Me Up!</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-shell">
-        <div class="blob"></div>
-        
-        <main class="glass-container">
-            <header class="app-header">
-                <div class="logo-area">
-                    <div class="icon-circle">🤟</div>
-                    <div class="title-text">
-                        <h1>Sign Me Up</h1>
-                        <p class="subtitle">AI-Powered Hand Sign Translation</p>
-                    </div>
-                </div>
-                <div class="status-badge" id="system-status">
-                    <span class="status-dot"></span> System Ready
-                </div>
-            </header>
+    <div class="app-container">
+        <header>
+            <h1><span class="emoji">🤟</span> Sign Me Up: Hand Sign Translator</h1>
+        </header>
 
-            <div class="main-layout">
-                
-                <section class="camera-card">
-                    <div class="card-label">Visual Input</div>
-                    <div class="video-wrapper">
-                        <video id="input_video" autoplay playsinline></video>
-                        <canvas id="output_canvas" width="640" height="480"></canvas>
-                        
-                        <div id="camera-placeholder" class="overlay-ui">
-                            <div class="pulse-icon">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                    <circle cx="12" cy="13" r="4"></circle>
-                                </svg>
-                            </div>
-                            <p>Camera is currently offline</p>
-                        </div>
+        <div class="dashboard-grid">
+            
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="input_video"></video>
+                    <canvas id="output_canvas" width="640" height="480"></canvas>
+                    
+                    <div id="camera-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </div>
 
-                        <div id="loading-spinner" class="spinner hidden"></div>
-                    </div>
+                    <div id="loading-spinner" class="spinner hidden"></div>
+                </div>
 
-                    <div class="camera-controls">
-                        <button id="start-btn" class="btn-primary" onclick="toggleCamera()">
-                            <span class="btn-label">START CAMERA</span>
-                        </button>
-                        <div class="custom-select-container">
-                            <select id="device-select">
-                                <option value="" disabled selected>SELECT INPUT DEVICE</option>
-                            </select>
-                        </div>
-                    </div>
-                </section>
+                <div class="controls-row">
+                    <button id="start-btn" onclick="toggleCamera()">START</button>
+                    <div class="select-wrapper">
+                        <select id="device-select">
+                            <option value="" disabled selected>SELECT DEVICE</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-                <section class="data-card">
-                    
-                    <div class="detection-box">
-                        <h3 class="section-title">Current Sign</h3>
-                        <div class="prediction-display-area" id="prediction-display">
-                            <span class="placeholder-text">Waiting for input...</span>
-                        </div>
-                        
-                        <div class="confidence-wrapper">
-                            <div class="confidence-info">
-                                <span>Confidence Score</span>
-                                <span id="conf-value">0%</span>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-fill" id="conf-fill" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="output-section">
+                
+                <div class="output-block">
+                    <h2>Current Detected Sign</h2>
+                    <div class="output-box single-line" id="prediction-display">
+                        <span class="placeholder-text">Waiting...</span>
+                    </div>
+                    <div class="confidence-container" id="confidence-bar-container">
+                        <div class="confidence-label">Confidence: <span id="conf-value">0%</span></div>
+                        <div class="progress-bg">
+                            <div class="progress-fill" id="conf-fill"></div>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="translation-box">
-                        <h3 class="section-title">Translation History</h3>
-                        
-                        <div class="history-grid">
-                            <div class="lang-unit">
-                                <div class="unit-header">
-                                    <img src="https://flagcdn.com/w20/gb.png" alt="English Flag" class="flag-icon">
-                                    <span>English</span>
-                                </div>
-                                <div id="output-en" class="text-output-window">
-                                    <span class="placeholder-text">Waiting...</span>
-                                </div>
-                            </div>
+                <div class="output-block">
+                    <h2>Accumulated Sentence</h2>
+                    
+                    <div class="split-output-container">
+                        <div class="split-col">
+                            <label class="lang-label">English</label>
+                            <div id="output-en" class="output-box multi-line">
+                                <span class="placeholder-text">...</span>
+                            </div>
+                        </div>
 
-                            <div class="lang-unit">
-                                <div class="unit-header">
-                                    <img src="https://flagcdn.com/w20/my.png" alt="Malaysia Flag" class="flag-icon">
-                                    <span>Bahasa Melayu</span>
-                                </div>
-                                <div id="output-ms" class="text-output-window">
-                                    <span class="placeholder-text">...</span>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="split-col">
+                            <label class="lang-label">Bahasa Melayu</label>
+                            <div id="output-ms" class="output-box multi-line">
+                                <span class="placeholder-text">...</span>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="action-toolbar">
-                            <button id="backspace-btn" class="btn-secondary" onclick="handleBackspace()">
-                                <span class="icon">⌫</span> Backspace
-                            </button>
-                            <button id="clear-btn" class="btn-danger" onclick="clearSentence()">
-                                <span class="icon">🗑</span> Clear All
-                            </button>
-                        </div>
-                    </div>
+                    <div class="action-buttons">
+                        <button id="backspace-btn" onclick="handleBackspace()">⌫ Backspace</button>
+                        <button id="clear-btn" onclick="clearSentence()">Clear All</button>
+                    </div>
+                </div>
 
-                </section>
-            </div>
-        </main>
-    </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
