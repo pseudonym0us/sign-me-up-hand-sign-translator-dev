@@ -3,91 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Me Up!</title>
+    <title>NEXUS | AI Vision Core</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-container">
-        <header>
-            <h1><span class="emoji">🤟</span> Sign Me Up: Hand Sign Translator</h1>
-        </header>
+    <div class="cyber-grid"></div>
 
-        <div class="dashboard-grid">
-            
-            <div class="video-section">
-                <div class="video-container">
-                    <video id="input_video"></video>
-                    <canvas id="output_canvas" width="640" height="480"></canvas>
-                    
-                    <div id="camera-placeholder">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                    </div>
-
-                    <div id="loading-spinner" class="spinner hidden"></div>
+    <main class="dashboard-container">
+        
+        <header class="sys-header">
+            <div class="brand">
+                <div class="logo-mark">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
-
-                <div class="controls-row">
-                    <button id="start-btn" onclick="toggleCamera()">START</button>
-                    <div class="select-wrapper">
-                        <select id="device-select">
-                            <option value="" disabled selected>SELECT DEVICE</option>
-                        </select>
-                    </div>
+                <div>
+                    <h1>NEXUS <span class="fw-light">VISION CORE</span></h1>
+                    <p class="sys-status">ENTERPRISE KINETIC TRANSLATION PROTOCOL</p>
                 </div>
             </div>
+            <div class="status-indicator">
+                <div class="pulse-dot online"></div>
+                <span>SYSTEM ONLINE</span>
+            </div>
+        </header>
 
-            <div class="output-section">
+        <div class="grid-layout">
+            
+            <section class="panel camera-panel">
+                <div class="panel-header">
+                    <h2>OPTICAL SENSOR FEED</h2>
+                    <span class="badge">SECURE</span>
+                </div>
                 
-                <div class="output-block">
-                    <h2>Current Detected Sign</h2>
-                    <div class="output-box single-line" id="prediction-display">
-                        <span class="placeholder-text">Waiting...</span>
+                <div class="video-wrapper">
+                    <video id="input_video" autoplay playsinline></video>
+                    <canvas id="output_canvas" width="640" height="480"></canvas>
+                    
+                    <div id="loading-spinner" class="spinner hidden"></div>
+
+                    <div id="camera-placeholder" class="feed-overlay">
+                        <div class="overlay-content">
+                            <h3>SENSOR OFFLINE</h3>
+                            <p>Awaiting initialization command...</p>
+                        </div>
                     </div>
-                    <div class="confidence-container" id="confidence-bar-container">
-                        <div class="confidence-label">Confidence: <span id="conf-value">0%</span></div>
-                        <div class="progress-bg">
+                    
+                    <div class="corner t-l"></div><div class="corner t-r"></div>
+                    <div class="corner b-l"></div><div class="corner b-r"></div>
+                </div>
+
+                <div class="control-deck">
+                    <button id="start-btn" class="cyber-btn btn-primary" onclick="toggleCamera()">
+                        INITIALIZE SENSOR
+                    </button>
+                    <select id="device-select" class="cyber-select">
+                        <option value="" disabled selected>SELECT INPUT DEVICE</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="data-section">
+                
+                <div class="panel analytics-panel">
+                    <div class="panel-header">
+                        <h2>REAL-TIME CLASSIFICATION</h2>
+                    </div>
+                    
+                    <div class="target-box">
+                        <div id="prediction-display">
+                            <span class="placeholder-text">AWAITING GESTURE...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="confidence-bar-container" class="telemetry">
+                        <div class="telemetry-labels">
+                            <span>CONFIDENCE METRIC</span>
+                            <span id="conf-value" class="highlight">0%</span>
+                        </div>
+                        <div class="progress-bar">
                             <div class="progress-fill" id="conf-fill"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="output-block">
-                    <h2>Accumulated Sentence</h2>
-                    
-                    <div class="split-output-container">
-                        <div class="split-col">
-                            <label class="lang-label">English</label>
-                            <div id="output-en" class="output-box multi-line">
-                                <span class="placeholder-text">...</span>
-                            </div>
-                        </div>
-
-                        <div class="split-col">
-                            <label class="lang-label">Bahasa Melayu</label>
-                            <div id="output-ms" class="output-box multi-line">
-                                <span class="placeholder-text">...</span>
-                            </div>
+                <div class="panel translation-panel">
+                    <div class="panel-header">
+                        <h2>TRANSLATION LOG</h2>
+                        <div class="action-icons">
+                            <button id="backspace-btn" class="icon-btn" onclick="handleBackspace()" title="Backspace">⌫</button>
+                            <button id="clear-btn" class="icon-btn danger" onclick="clearSentence()" title="Clear Memory">✕</button>
                         </div>
                     </div>
-
-                    <div class="action-buttons">
-                        <button id="backspace-btn" onclick="handleBackspace()">⌫ Backspace</button>
-                        <button id="clear-btn" onclick="clearSentence()">Clear All</button>
+                    
+                    <div class="log-container">
+                        <div class="log-entry">
+                            <label>EN_OUTPUT</label>
+                            <div id="output-en" class="output-text">
+                                <span class="placeholder-text">System standby...</span>
+                            </div>
+                        </div>
+                        <div class="log-entry">
+                            <label>MS_OUTPUT</label>
+                            <div id="output-ms" class="output-text">
+                                <span class="placeholder-text">Sistem bersedia...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-            </div>
+            </section>
         </div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
