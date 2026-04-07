@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGN ME UP HAND SIGN TRANSLATOR</title>
+    <title>Sign Me Up | AI Translation</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
     
@@ -16,105 +18,95 @@
 </head>
 <body>
 
-    <div class="cyber-grid"></div>
-
-    <main class="dashboard-container">
+    <main class="app-wrapper">
         
-        <header class="sys-header">
+        <header class="app-header">
             <div class="brand">
-                <div class="logo-mark">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-                <div>
-                    <h1>SIGN ME UP <span class="fw-light">HAND SIGN TRANSLATOR</span></h1>
-                    <p class="sys-status">UNIVERSITI KEBANGSAAN MALAYSIA</p>
-                </div>
+                <div class="brand-icon">🤟</div>
+                <h1>Sign Me Up.</h1>
             </div>
-            <div class="status-indicator">
-                <div class="pulse-dot online"></div>
-                <span>SYSTEM ONLINE</span>
+            <div class="tagline">
+                Seamless AI translation for a more connected world.
             </div>
         </header>
 
-        <div class="grid-layout">
+        <div class="dashboard-layout">
             
-            <section class="panel camera-panel">
-                <div class="panel-header">
-                    <h2>OPTICAL SENSOR FEED</h2>
-                    <span class="badge">SECURE</span>
+            <section class="card vision-card">
+                <div class="card-header">
+                    <h2>Optical Input</h2>
+                    <span class="status-pill">Ready</span>
                 </div>
                 
-                <div class="video-wrapper">
+                <div class="video-container">
                     <video id="input_video" autoplay playsinline></video>
                     <canvas id="output_canvas" width="640" height="480"></canvas>
                     
                     <div id="loading-spinner" class="spinner hidden"></div>
 
-                    <div id="camera-placeholder" class="feed-overlay">
-                        <div class="overlay-content">
-                            <h3>SENSOR OFFLINE</h3>
-                            <p>Awaiting initialization command...</p>
+                    <div id="camera-placeholder" class="overlay-state">
+                        <div class="overlay-text">
+                            <h3>Camera Paused</h3>
+                            <p>Start the camera to begin translating.</p>
                         </div>
                     </div>
-                    
-                    <div class="corner t-l"></div><div class="corner t-r"></div>
-                    <div class="corner b-l"></div><div class="corner b-r"></div>
                 </div>
 
-                <div class="control-deck">
-                    <button id="start-btn" class="cyber-btn btn-primary" onclick="toggleCamera()">
-                        INITIALIZE SENSOR
-                    </button>
-                    <select id="device-select" class="cyber-select">
-                        <option value="" disabled selected>SELECT INPUT DEVICE</option>
+                <div class="controls-container">
+                    <select id="device-select" class="elegant-select">
+                        <option value="" disabled selected>Select Camera Device</option>
                     </select>
+                    <button id="start-btn" class="btn-primary" onclick="toggleCamera()">
+                        Start Camera
+                    </button>
                 </div>
             </section>
 
-            <section class="data-section">
+            <section class="card output-card">
                 
-                <div class="panel analytics-panel">
-                    <div class="panel-header">
-                        <h2>REAL-TIME CLASSIFICATION</h2>
-                    </div>
-                    
-                    <div class="target-box">
+                <div class="detection-wrapper">
+                    <h2 class="section-title">Current Gesture</h2>
+                    <div class="gesture-display-box">
                         <div id="prediction-display">
-                            <span class="placeholder-text">AWAITING GESTURE...</span>
+                            <span class="placeholder-text">Waiting...</span>
                         </div>
                     </div>
                     
-                    <div id="confidence-bar-container" class="telemetry">
-                        <div class="telemetry-labels">
-                            <span>CONFIDENCE METRIC</span>
-                            <span id="conf-value" class="highlight">0%</span>
+                    <div id="confidence-bar-container" class="confidence-tracker">
+                        <div class="confidence-header">
+                            <span>Certainty</span>
+                            <span id="conf-value" class="conf-percentage">0%</span>
                         </div>
-                        <div class="progress-bar">
+                        <div class="progress-track">
                             <div class="progress-fill" id="conf-fill"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="panel translation-panel">
-                    <div class="panel-header">
-                        <h2>TRANSLATION LOG</h2>
-                        <div class="action-icons">
-                            <button id="backspace-btn" class="icon-btn" onclick="handleBackspace()" title="Backspace">⌫</button>
-                            <button id="clear-btn" class="icon-btn danger" onclick="clearSentence()" title="Clear Memory">✕</button>
+                <div class="translation-wrapper">
+                    <div class="translation-header">
+                        <h2 class="section-title">Translation</h2>
+                        <div class="action-buttons">
+                            <button id="backspace-btn" class="btn-icon" onclick="handleBackspace()" title="Backspace">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                            </button>
+                            <button id="clear-btn" class="btn-icon danger" onclick="clearSentence()" title="Clear">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="log-container">
-                        <div class="log-entry">
-                            <label>EN_OUTPUT</label>
-                            <div id="output-en" class="output-text">
-                                <span class="placeholder-text">System standby...</span>
+                    <div class="output-grid">
+                        <div class="lang-box">
+                            <label>English</label>
+                            <div id="output-en" class="text-window">
+                                <span class="placeholder-text">Translation will appear here...</span>
                             </div>
                         </div>
-                        <div class="log-entry">
-                            <label>MS_OUTPUT</label>
-                            <div id="output-ms" class="output-text">
-                                <span class="placeholder-text">Sistem bersedia...</span>
+                        <div class="lang-box">
+                            <label>Bahasa Melayu</label>
+                            <div id="output-ms" class="text-window">
+                                <span class="placeholder-text">Terjemahan akan dipaparkan...</span>
                             </div>
                         </div>
                     </div>
