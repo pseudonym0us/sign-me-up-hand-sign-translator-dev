@@ -1,4 +1,4 @@
-/* === ENTERPRISE GLC CYBER THEME === */
+/* === ENTERPRISE GLC CYBER THEME (LAPTOP OPTIMIZED) === */
 :root {
     --space-bg: #050b14;
     --panel-bg: rgba(12, 20, 35, 0.85);
@@ -19,7 +19,9 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* FIX: Changed from 'center' to 'flex-start' so it doesn't get pushed off-screen on laptops */
+    align-items: flex-start; 
+    padding: 30px 15px; 
 }
 
 h1, h2, h3, .cyber-btn, .badge, label, .sys-status, .telemetry-labels {
@@ -44,7 +46,9 @@ h1, h2, h3, .cyber-btn, .badge, label, .sys-status, .telemetry-labels {
 
 /* Main Dashboard Shell */
 .dashboard-container {
-    width: 95vw; max-width: 1300px;
+    width: 100%; 
+    max-width: 1300px;
+    margin: 0 auto; /* Ensure horizontal centering */
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -71,9 +75,13 @@ h1, h2, h3, .cyber-btn, .badge, label, .sys-status, .telemetry-labels {
 .pulse-dot.online { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-/* Layout */
-.grid-layout { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; }
-@media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
+/* Layout - Adjusted for Laptops */
+.grid-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; }
+@media (max-width: 1024px) { 
+    /* Triggers stacking earlier for smaller laptops */
+    .grid-layout { grid-template-columns: 1fr; } 
+    .dashboard-container { padding: 20px; }
+}
 
 /* Inner Panels */
 .panel { 
@@ -108,17 +116,17 @@ h1, h2, h3, .cyber-btn, .badge, label, .sys-status, .telemetry-labels {
 .overlay-content p { color: var(--text-muted); font-size: 0.9rem;}
 
 /* Controls */
-.control-deck { display: flex; gap: 15px; }
-.cyber-select { flex: 1; background: rgba(0,0,0,0.5); color: var(--cyan); border: 1px solid var(--border-color); padding: 12px; font-family: 'Rajdhani'; font-size: 1rem; outline: none; cursor: pointer; }
-.cyber-btn { flex: 1; padding: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; border: 1px solid var(--cyan); background: rgba(0, 212, 255, 0.1); color: var(--cyan); }
+.control-deck { display: flex; flex-wrap: wrap; gap: 15px; }
+.cyber-select { flex: 1; min-width: 200px; background: rgba(0,0,0,0.5); color: var(--cyan); border: 1px solid var(--border-color); padding: 12px; font-family: 'Rajdhani'; font-size: 1rem; outline: none; cursor: pointer; }
+.cyber-btn { flex: 1; min-width: 200px; padding: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; border: 1px solid var(--cyan); background: rgba(0, 212, 255, 0.1); color: var(--cyan); }
 .cyber-btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 15px rgba(0, 212, 255, 0.5); }
 
 /* Analytics Box */
 .data-section { display: flex; flex-direction: column; gap: 30px; }
 .target-box { background: rgba(0, 212, 255, 0.03); border: 1px solid var(--border-color); min-height: 120px; display: flex; align-items: center; justify-content: center; padding: 20px; }
 #prediction-display { text-align: center; }
-#prediction-display span:first-child { display: block; font-size: 3rem; font-weight: 700; color: #fff; font-family: 'Rajdhani'; text-shadow: 0 0 10px rgba(0,212,255,0.5); }
-#prediction-display span:last-child { display: block; font-size: 1.1rem; color: var(--cyan); margin-top: 5px;}
+#prediction-display span:first-child { display: block; font-size: 2.5rem; font-weight: 700; color: #fff; font-family: 'Rajdhani'; text-shadow: 0 0 10px rgba(0,212,255,0.5); }
+#prediction-display span:last-child { display: block; font-size: 1rem; color: var(--cyan); margin-top: 5px;}
 
 /* Telemetry (Confidence) */
 .telemetry-labels { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
@@ -129,12 +137,12 @@ h1, h2, h3, .cyber-btn, .badge, label, .sys-status, .telemetry-labels {
 /* Output Logs */
 .log-container { display: flex; flex-direction: column; gap: 15px; }
 .log-entry label { font-size: 0.85rem; color: var(--cyan); margin-bottom: 5px; display: block; }
-.output-text { background: rgba(0,0,0,0.5); border-left: 2px solid var(--cyan); padding: 15px; min-height: 70px; font-size: 1rem; color: var(--text-main); font-family: monospace; }
+.output-text { background: rgba(0,0,0,0.5); border-left: 2px solid var(--cyan); padding: 15px; min-height: 70px; font-size: 1rem; color: var(--text-main); font-family: monospace; word-wrap: break-word; }
 .placeholder-text { color: var(--text-muted); }
 
 /* Log Buttons */
 .action-icons { display: flex; gap: 10px; }
-.icon-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); width: 30px; height: 30px; cursor: pointer; transition: 0.2s; }
+.icon-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); width: 30px; height: 30px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
 .icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
 .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
 
