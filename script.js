@@ -292,6 +292,7 @@ function handleLogic(predictedLabel, confidence) {
 
     if (consecutiveFrames === STABILITY_THRESHOLD) {
         
+        // Z Logic
         if (predictedLabel.includes("_") && !hidden_signs.has(predictedLabel)) {
             let parts = predictedLabel.split("_");
             let baseName = parts[0];
@@ -322,12 +323,15 @@ function handleLogic(predictedLabel, confidence) {
                     let shouldPrint = true;
                     let isModifierReplace = false;
 
+                    // --- 1. MODIFIER CHECK ---
                     if (modifiers[predictedLabel]) {
                         let required = modifiers[predictedLabel];
                         
+                        // Check if it's a single letter (I -> J)
                         if (required.length === 1) {
                             if (sentenceHistory.length > 0) {
                                 let lastItem = sentenceHistory[sentenceHistory.length - 1];
+                                // Check if spelling block ends with required letter (Case Insensitive)
                                 if (lastItem.isLetter && lastItem.en.toUpperCase().endsWith(required)) {
                                     isModifierReplace = true;
                                 } else {
@@ -337,6 +341,7 @@ function handleLogic(predictedLabel, confidence) {
                                 shouldPrint = false;
                             }
                         } 
+                        // Normal word check
                         else {
                             if (lastValidEntry === required) {
                                 isModifierReplace = true;
@@ -349,6 +354,7 @@ function handleLogic(predictedLabel, confidence) {
                     if (shouldPrint) {
                         let comboKey = lastValidEntry + "|" + predictedLabel;
                         
+                        // 2. Activator Check (Merging)
                         if (activators[comboKey]) {
                             let newWord = activators[comboKey];
                             removeLastSign(); 
@@ -356,12 +362,14 @@ function handleLogic(predictedLabel, confidence) {
                             lastValidEntry = newWord;
                             wasLastHidden = false;
                         } 
+                        // 3. Modifier Replacement
                         else if (isModifierReplace) {
                             removeLastSign(); 
                             addToSentence(predictedLabel); 
                             lastValidEntry = predictedLabel;
                             wasLastHidden = false;
                         } 
+                        // 4. Standard Print
                         else {
                             addToSentence(predictedLabel);
                             lastValidEntry = predictedLabel;
@@ -373,6 +381,36 @@ function handleLogic(predictedLabel, confidence) {
             }
         }
     }
+}
+
+function removeLastSign() {
+    if (sentenceHistory.length === 0) return;
+    if (wasLastHidden) return;
+
+    let lastIdx = sentenceHistory.length - 1;
+    let item = sentenceHistory[lastIdx];
+
+    if (item.isLetter && item.en.length > 0) {
+        item.en = item.en.slice(0, -1);
+        item.ms = item.ms.slice(0, -1);
+        
+        if (item.en.length === 0) {
+            sentenceHistory.pop();
+            if (sentenceHistory.length > 0) {
+                lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
+            } else {
+                lastTypeWasLetter = false;
+            }
+        }
+    } else {
+        sentenceHistory.pop();
+        if (sentenceHistory.length > 0) {
+            lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
+        } else {
+            lastTypeWasLetter = false;
+        }
+    }
+    renderBuffer();
 }
 
 function handleNoHand() {
