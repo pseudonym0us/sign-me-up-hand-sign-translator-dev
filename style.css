@@ -23,7 +23,9 @@
 body {
     background-color: var(--bg-cream);
     color: var(--text-dark);
-    font-family: 'DM Sans', sans-serif;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
     height: 100vh; /* Strictly limit to viewport height */
     overflow: hidden; /* Prevent all vertical scrolling */
     display: flex;
@@ -34,8 +36,9 @@ body {
 }
 
 h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 500;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
     color: var(--accent-forest);
 }
 
@@ -71,7 +74,10 @@ h1, h2, h3 {
 }
 .app-header h1 {
     font-size: 2.8rem;
+    font-family: 'Erica One', sans-serif;
+    font-weight: 400;
     letter-spacing: -0.5px;
+    color: var(--accent-terracotta);
 }
 .tagline {
     font-size: 1.1rem;
@@ -165,7 +171,9 @@ h1, h2, h3 {
     border: 1px solid var(--accent-sand);
     padding: 16px 20px;
     border-radius: var(--radius-pill);
-    font-family: 'DM Sans', sans-serif;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
     font-size: 1rem;
     color: var(--text-dark);
     cursor: pointer;
@@ -207,7 +215,9 @@ h1, h2, h3 {
 }
 #prediction-display span:first-child {
     display: block;
-    font-family: 'Playfair Display', serif;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
     font-size: 3rem;
     font-weight: 600;
     color: var(--accent-forest);
