@@ -3,127 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Me Up | AI Translator</title>
+    <title>Sign Me Up | AI Translation</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-shell">
-        <div class="blob"></div>
+    <main class="app-wrapper">
         
-        <main class="glass-container">
-            <header class="app-header">
-                <div class="logo-area">
-                    <div class="icon-circle">🤟</div>
-                    <div class="title-text">
-                        <h1>Sign Me Up</h1>
-                        <p class="subtitle">AI-Powered Hand Sign Translation</p>
-                    </div>
-                </div>
-                <div class="status-badge" id="system-status">
-                    <span class="status-dot"></span> System Ready
-                </div>
-            </header>
-
-            <div class="main-layout">
-                
-                <section class="camera-card">
-                    <div class="card-label">Visual Input</div>
-                    <div class="video-wrapper">
-                        <video id="input_video" autoplay playsinline></video>
-                        <canvas id="output_canvas" width="640" height="480"></canvas>
-                        
-                        <div id="camera-placeholder" class="overlay-ui">
-                            <div class="pulse-icon">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                    <circle cx="12" cy="13" r="4"></circle>
-                                </svg>
-                            </div>
-                            <p>Camera is currently offline</p>
-                        </div>
-
-                        <div id="loading-spinner" class="spinner hidden"></div>
-                    </div>
-
-                    <div class="camera-controls">
-                        <button id="start-btn" class="btn-primary" onclick="toggleCamera()">
-                            <span class="btn-label">START CAMERA</span>
-                        </button>
-                        <div class="custom-select-container">
-                            <select id="device-select">
-                                <option value="" disabled selected>SELECT INPUT DEVICE</option>
-                            </select>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="data-card">
-                    
-                    <div class="detection-box">
-                        <h3 class="section-title">Current Sign</h3>
-                        <div class="prediction-display-area" id="prediction-display">
-                            <span class="placeholder-text">Waiting for input...</span>
-                        </div>
-                        
-                        <div class="confidence-wrapper">
-                            <div class="confidence-info">
-                                <span>Confidence Score</span>
-                                <span id="conf-value">0%</span>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-fill" id="conf-fill" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="translation-box">
-                        <h3 class="section-title">Translation History</h3>
-                        
-                        <div class="history-grid">
-                            <div class="lang-unit">
-                                <div class="unit-header">
-                                    <img src="https://flagcdn.com/w20/gb.png" alt="English Flag" class="flag-icon">
-                                    <span>English</span>
-                                </div>
-                                <div id="output-en" class="text-output-window">
-                                    <span class="placeholder-text">Waiting...</span>
-                                </div>
-                            </div>
-
-                            <div class="lang-unit">
-                                <div class="unit-header">
-                                    <img src="https://flagcdn.com/w20/my.png" alt="Malaysia Flag" class="flag-icon">
-                                    <span>Bahasa Melayu</span>
-                                </div>
-                                <div id="output-ms" class="text-output-window">
-                                    <span class="placeholder-text">...</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="action-toolbar">
-                            <button id="backspace-btn" class="btn-secondary" onclick="handleBackspace()">
-                                <span class="icon">⌫</span> Backspace
-                            </button>
-                            <button id="clear-btn" class="btn-danger" onclick="clearSentence()">
-                                <span class="icon">🗑</span> Clear All
-                            </button>
-                        </div>
-                    </div>
-
-                </section>
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">🤟</div>
+                <h1>Sign Me Up.</h1>
             </div>
-        </main>
-    </div>
+            <div class="tagline">
+                Seamless AI translation for a more connected world.
+            </div>
+        </header>
+
+        <div class="dashboard-layout">
+            
+            <section class="card vision-card">
+                <div class="card-header">
+                    <h2>Optical Input</h2>
+                    <span class="status-pill">Ready</span>
+                </div>
+                
+                <div class="video-container">
+                    <video id="input_video" autoplay playsinline></video>
+                    <canvas id="output_canvas" width="640" height="480"></canvas>
+                    
+                    <div id="loading-spinner" class="spinner hidden"></div>
+
+                    <div id="camera-placeholder" class="overlay-state">
+                        <div class="overlay-text">
+                            <h3>Camera Paused</h3>
+                            <p>Start the camera to begin translating.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-container">
+                    <select id="device-select" class="elegant-select">
+                        <option value="" disabled selected>Select Camera Device</option>
+                    </select>
+                    <button id="start-btn" class="btn-primary" onclick="toggleCamera()">
+                        Start Camera
+                    </button>
+                </div>
+            </section>
+
+            <section class="card output-card">
+                
+                <div class="detection-wrapper">
+                    <h2 class="section-title">Current Gesture</h2>
+                    <div class="gesture-display-box">
+                        <div id="prediction-display">
+                            <span class="placeholder-text">Waiting...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="confidence-bar-container" class="confidence-tracker">
+                        <div class="confidence-header">
+                            <span>Certainty</span>
+                            <span id="conf-value" class="conf-percentage">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="conf-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="translation-wrapper">
+                    <div class="translation-header">
+                        <h2 class="section-title">Translation</h2>
+                        <div class="action-buttons">
+                            <button id="backspace-btn" class="btn-icon" onclick="handleBackspace()" title="Backspace">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                            </button>
+                            <button id="clear-btn" class="btn-icon danger" onclick="clearSentence()" title="Clear">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="output-grid">
+                        <div class="lang-box">
+                            <label>English</label>
+                            <div id="output-en" class="text-window">
+                                <span class="placeholder-text">Translation will appear here...</span>
+                            </div>
+                        </div>
+                        <div class="lang-box">
+                            <label>Bahasa Melayu</label>
+                            <div id="output-ms" class="text-window">
+                                <span class="placeholder-text">Terjemahan akan dipaparkan...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
