@@ -289,17 +289,42 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
 }
-.lang-box label {
+
+/* Language Headers & Speak Buttons */
+.lang-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-right: 4px;
+}
+.lang-header label {
+    margin-bottom: 0;
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
-    margin-bottom: 8px;
     padding-left: 5px;
-    flex-shrink: 0;
 }
+
+.speak-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--surface-white);
+    color: var(--accent-terracotta);
+    border-color: var(--accent-terracotta);
+}
+.speak-btn:hover {
+    background: var(--accent-terracotta);
+    color: var(--surface-white);
+}
+.speak-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
 .text-window {
     flex: 1; 
     min-height: 0;
@@ -357,15 +382,15 @@ h1, h2, h3 {
 
 /* === RESPONSIVE LAYOUTS === */
 
-/* Tablet Optimization */
-@media (max-width: 1024px) {
+/* Tablet Optimization (Only stack in portrait mode) */
+@media (max-width: 1024px) and (orientation: portrait) {
     .dashboard-layout { grid-template-columns: 1fr; }
     .app-header { flex-direction: column; align-items: flex-start; gap: 10px; }
     .tagline { text-align: left; }
 }
 
-/* Strict Mobile Optimization (No Scrolling Allowed) */
-@media (max-width: 768px) {
+/* Strict Mobile Optimization (Portrait - No Scrolling Allowed) */
+@media (max-width: 768px) and (orientation: portrait) {
     body {
         padding: 10px;
         height: 100dvh; /* Enforce viewport height */
@@ -505,6 +530,7 @@ h1, h2, h3 {
         flex-direction: column;
         gap: 8px;
         margin-top: 0;
+        width: 100%;
     }
 
     .translation-header {
@@ -514,7 +540,7 @@ h1, h2, h3 {
     .output-grid {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
         width: 100%;
         flex: 1;
         min-height: 0;
@@ -524,8 +550,23 @@ h1, h2, h3 {
         display: flex;
         flex-direction: column;
         width: 100%;
+        min-width: 0; /* CRITICAL FIX: prevents flex horizontal blowouts */
         flex: 1;
         min-height: 0;
+    }
+
+    .lang-header {
+        margin-bottom: 4px;
+    }
+    
+    .speak-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .speak-btn svg {
+        width: 14px;
+        height: 14px;
     }
 
     .btn-icon {
@@ -542,4 +583,116 @@ h1, h2, h3 {
         padding: 4px 10px;
         font-size: 0.75rem;
     }
+}
+
+/* === NEW: Mobile Landscape Optimization === */
+/* Forces the PC side-by-side layout, but aggressively squashes vertical space to prevent scrolling */
+@media (max-width: 950px) and (orientation: landscape) {
+    body {
+        padding: 8px;
+        height: 100dvh;
+        overflow: hidden;
+    }
+
+    .app-header {
+        margin-bottom: 8px;
+    }
+
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .tagline {
+        display: none; /* Hide to save vertical space */
+    }
+
+    /* Force the PC side-by-side layout */
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr; /* Same ratio as PC */
+        gap: 10px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .card {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .card-header h2, .section-title {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    /* Compress Camera Area */
+    .video-container {
+        flex: 1;
+        min-height: 80px;
+    }
+
+    .controls-container {
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .elegant-select, .btn-primary {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        min-width: 0;
+    }
+
+    /* Compress Translation Side */
+    .gesture-display-box {
+        height: 50px;
+        padding: 5px 10px;
+        margin-top: 0;
+    }
+
+    #prediction-display span:first-child {
+        font-size: clamp(0.9rem, 8cqw, 1.5rem);
+    }
+
+    .confidence-tracker {
+        margin-top: 5px;
+    }
+
+    .confidence-header {
+        margin-bottom: 2px;
+        font-size: 0.75rem;
+    }
+
+    .translation-wrapper {
+        gap: 8px;
+    }
+
+    .translation-header {
+        padding-top: 0;
+    }
+
+    .output-grid {
+        gap: 8px;
+    }
+
+    .text-window {
+        padding: 8px 12px;
+    }
+
+    .text-window span {
+        font-size: 0.85rem;
+    }
+
+    .lang-header {
+        margin-bottom: 2px;
+    }
+
+    .lang-header label {
+        font-size: 0.75rem;
+    }
+
+    /* Shrink Buttons */
+    .speak-btn { width: 24px; height: 24px; }
+    .speak-btn svg { width: 12px; height: 12px; }
+    .btn-icon { width: 30px; height: 30px; }
+    .btn-icon svg { width: 14px; height: 14px; }
 }

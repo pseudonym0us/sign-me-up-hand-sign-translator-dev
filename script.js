@@ -531,5 +531,30 @@ function renderBuffer() {
     outputMs.scrollTop = outputMs.scrollHeight;
 }
 
+// --- TEXT TO SPEECH ---
+function speakText(languageCode) {
+    if (sentenceHistory.length === 0) return;
+
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+
+    // Determine which text to read based on the requested language
+    const textToSpeak = sentenceHistory.map(item => item[languageCode]).join(" ");
+    
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    // Set the appropriate accent and pronunciation rules
+    if (languageCode === 'en') {
+        utterance.lang = 'en-GB'; 
+    } else if (languageCode === 'ms') {
+        utterance.lang = 'ms-MY';
+    }
+
+    utterance.rate = 1.0; 
+    utterance.pitch = 1.0;
+
+    window.speechSynthesis.speak(utterance);
+}
+
 // Run Init
 init();

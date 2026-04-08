@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Me Up | AI Translation</title>
+    <title>Sign Me Up: Handsign Translator</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,10 +22,10 @@
         
         <header class="app-header">
             <div class="brand">
-                <h1>Sign Me Up.</h1>
+                <h1>Sign Me Up</h1>
             </div>
             <div class="tagline">
-                Universiti Kebangsaan Malaysia
+                ASASIPintar 2025/2026 Universiti Kebangsaan Malaysia
             </div>
         </header>
 
@@ -97,13 +97,23 @@
                     
                     <div class="output-grid">
                         <div class="lang-box">
-                            <label>English</label>
+                            <div class="lang-header">
+                                <label>English</label>
+                                <button id="speak-en-btn" class="btn-icon speak-btn" onclick="speakText('en')" title="Speak English">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                </button>
+                            </div>
                             <div id="output-en" class="text-window">
                                 <span class="placeholder-text">Translation will appear here...</span>
                             </div>
                         </div>
                         <div class="lang-box">
-                            <label>Bahasa Melayu</label>
+                            <div class="lang-header">
+                                <label>Bahasa Melayu</label>
+                                <button id="speak-ms-btn" class="btn-icon speak-btn" onclick="speakText('ms')" title="Speak Bahasa Melayu">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                </button>
+                            </div>
                             <div id="output-ms" class="text-window">
                                 <span class="placeholder-text">Terjemahan akan dipaparkan...</span>
                             </div>
