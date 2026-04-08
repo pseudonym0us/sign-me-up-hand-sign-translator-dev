@@ -207,21 +207,35 @@ h1, h2, h3 {
     border-radius: var(--radius-md);
     padding: 20px;
     text-align: center;
-    min-height: 100px;
+    height: 100px;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 10px;
+    overflow: hidden;
+    container-type: inline-size;
+}
+#prediction-display {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
 }
 #prediction-display span:first-child {
     display: block;
     font-family: "Poppins", sans-serif;
     font-weight: 600;
     font-style: normal;
-    font-size: 3rem;
-    font-weight: 600;
+    /* Dynamically shrinks from 3rem down to 1.2rem based on container width */
+    font-size: clamp(1.2rem, 12cqw, 3rem); 
     color: var(--accent-forest);
     line-height: 1.1;
+    white-space: nowrap; /* Prevents word wrapping layout shifts */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Failsafe for exceptionally long words */
+    width: 100%;
 }
 #prediction-display span:last-child {
     display: block;
@@ -288,15 +302,22 @@ h1, h2, h3 {
     flex-shrink: 0;
 }
 .text-window {
-    flex: 1; /* Take up all available space in the lang-box */
+    flex: 1; 
     min-height: 0;
     background: var(--bg-cream);
     border: 1px solid var(--accent-sand);
     padding: 20px;
     border-radius: var(--radius-md);
-    font-size: 1.1rem;
     color: var(--text-dark);
-    overflow-y: auto; /* Allow internal scrolling if text overflows parent boundaries */
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word; /* Forces long unbroken text to wrap */
+    container-type: inline-size;
+}
+
+.text-window span {
+    /* Optional: allow output text to scale slightly based on box size */
+    font-size: clamp(0.9rem, 5cqw, 1.1rem);
 }
 .placeholder-text { color: #A0A5A1; font-style: italic; }
 
@@ -440,28 +461,31 @@ h1, h2, h3 {
     }
 
     .gesture-display-box {
-        min-height: 50px;
+        height: 60px; /* Fixed height for mobile */
+        min-height: unset;
         padding: 5px 12px;
         margin-top: 0;
         flex: 1;
         flex-direction: row;
         gap: 8px;
         justify-content: flex-start;
+        overflow: hidden;
+        container-type: inline-size;
     }
 
     #prediction-display {
         display: flex;
+        flex-direction: row;
         align-items: baseline;
         gap: 8px;
+        width: 100%;
     }
 
     #prediction-display span:first-child {
-        font-size: 1.5rem;
-    }
-
-    #prediction-display span:last-child {
-        font-size: 0.8rem;
-        margin-top: 0;
+        /* Shrinks down to 1rem if the word is too long for mobile */
+        font-size: clamp(1rem, 15cqw, 1.5rem); 
+        white-space: nowrap;
+        width: auto;
     }
 
     .confidence-tracker {
