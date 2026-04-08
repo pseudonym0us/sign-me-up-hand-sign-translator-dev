@@ -1,6 +1,6 @@
 /* === MAXIMA THERAPY INSPIRED THEME === */
 :root {
-    /* Soft, organic color palette */
+    /* Soft, organic colour palette */
     --bg-cream: #F5F3EF;
     --surface-white: #FFFFFF;
     --text-dark: #2C332D;
@@ -27,7 +27,7 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Ensures no cut-off on laptops */
+    align-items: flex-start;
     padding: 40px 20px;
     line-height: 1.5;
 }
@@ -80,12 +80,6 @@ h1, h2, h3 {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     gap: 30px;
-}
-
-@media (max-width: 1024px) {
-    .dashboard-layout { grid-template-columns: 1fr; }
-    .app-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .tagline { text-align: left; }
 }
 
 /* Cards (Panels) */
@@ -303,3 +297,201 @@ h1, h2, h3 {
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 .hidden { display: none !important; }
+
+
+/* === RESPONSIVE LAYOUTS === */
+
+/* Tablet Optimization */
+@media (max-width: 1024px) {
+    .dashboard-layout { grid-template-columns: 1fr; }
+    .app-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .tagline { text-align: left; }
+}
+
+/* Strict Mobile Optimization (No Scrolling Allowed) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        height: 100dvh; /* Enforce viewport height */
+        overflow: hidden; /* Strictly prevent vertical scrolling */
+    }
+
+    .app-wrapper {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .app-header {
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    .brand-icon {
+        font-size: 1.2rem;
+        padding: 8px;
+    }
+
+    .app-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .tagline {
+        display: none; /* Hidden to preserve vertical space */
+    }
+
+    .dashboard-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+        min-height: 0; /* Allows grid children to shrink instead of overflowing */
+    }
+
+    .card {
+        padding: 12px;
+        gap: 10px;
+        border-radius: var(--radius-md);
+    }
+
+    .vision-card {
+        flex: 0 0 auto;
+    }
+
+    .output-card {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+    }
+
+    .card-header h2, .section-title {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .video-container {
+        aspect-ratio: auto;
+        height: 22vh; /* Responsive height based on view */
+        min-height: 120px;
+        max-height: 180px;
+        flex: none;
+    }
+
+    .controls-container {
+        gap: 8px;
+        flex-wrap: nowrap;
+    }
+
+    .elegant-select, .btn-primary {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        min-width: 0;
+    }
+
+    /* Compress Detection Area */
+    .detection-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .detection-wrapper .section-title {
+        display: none; /* Hidden to save space */
+    }
+
+    .gesture-display-box {
+        min-height: 50px;
+        padding: 5px 12px;
+        margin-top: 0;
+        flex: 1;
+        flex-direction: row;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
+    #prediction-display {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    #prediction-display span:first-child {
+        font-size: 1.5rem;
+    }
+
+    #prediction-display span:last-child {
+        font-size: 0.8rem;
+        margin-top: 0;
+    }
+
+    .confidence-tracker {
+        margin-top: 0;
+        flex: 1;
+    }
+
+    .confidence-header {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    /* Compress Translation Output Area */
+    .translation-wrapper {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 0;
+    }
+
+    .translation-header {
+        padding-top: 4px;
+    }
+
+    .output-grid {
+        flex-direction: row; /* Places translation boxes side-by-side */
+        gap: 8px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .lang-box {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .lang-box label {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    .text-window {
+        min-height: 0;
+        flex: 1;
+        padding: 10px;
+        font-size: 0.9rem;
+        overflow-y: auto; /* Allows internal scrolling if text is too long, protecting parent container */
+    }
+
+    .btn-icon {
+        width: 34px; 
+        height: 34px;
+    }
+
+    .btn-icon svg {
+        width: 16px; 
+        height: 16px;
+    }
+
+    .status-pill {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+    }
+}
