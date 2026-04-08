@@ -512,8 +512,18 @@ h1, h2, h3 {
     }
 
     .output-grid {
+        display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .lang-box {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
         flex: 1;
         min-height: 0;
     }
