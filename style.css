@@ -512,7 +512,7 @@ h1, h2, h3 {
     }
 
     .output-grid {
-        flex-direction: row; /* Places translation boxes side-by-side */
+        flex-direction: column;
         gap: 8px;
         flex: 1;
         min-height: 0;
