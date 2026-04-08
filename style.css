@@ -228,13 +228,12 @@ h1, h2, h3 {
     font-family: "Poppins", sans-serif;
     font-weight: 600;
     font-style: normal;
-    /* Dynamically shrinks from 3rem down to 1.2rem based on container width */
-    font-size: clamp(1.2rem, 12cqw, 3rem); 
+    font-size: clamp(1rem, 8cqw, 2.8rem); 
     color: var(--accent-forest);
     line-height: 1.1;
-    white-space: nowrap; /* Prevents word wrapping layout shifts */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Failsafe for exceptionally long words */
+    
+    white-space: normal;
+    word-wrap: break-word;
     width: 100%;
 }
 #prediction-display span:last-child {
@@ -482,10 +481,10 @@ h1, h2, h3 {
     }
 
     #prediction-display span:first-child {
-        /* Shrinks down to 1rem if the word is too long for mobile */
-        font-size: clamp(1rem, 15cqw, 1.5rem); 
-        white-space: nowrap;
-        width: auto;
+        font-size: clamp(0.85rem, 10cqw, 1.5rem); 
+        white-space: normal; 
+        word-wrap: break-word;
+        width: 100%;
     }
 
     .confidence-tracker {
