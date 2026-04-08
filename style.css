@@ -24,11 +24,12 @@ body {
     background-color: var(--bg-cream);
     color: var(--text-dark);
     font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
+    height: 100vh; /* Strictly limit to viewport height */
+    overflow: hidden; /* Prevent all vertical scrolling */
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 40px 20px;
+    align-items: center;
+    padding: 20px; /* Reduced padding to maximise screen real estate */
     line-height: 1.5;
 }
 
@@ -40,8 +41,11 @@ h1, h2, h3 {
 
 .app-wrapper {
     width: 100%;
+    height: 100%; /* Fill available body height */
     max-width: 1280px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header */
@@ -49,8 +53,9 @@ h1, h2, h3 {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 40px;
+    margin-bottom: 20px; /* Reduced from 40px */
     padding: 0 10px;
+    flex-shrink: 0; /* Prevent header from squashing */
 }
 .brand {
     display: flex;
@@ -79,24 +84,28 @@ h1, h2, h3 {
 .dashboard-layout {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
-    gap: 30px;
+    gap: 20px; /* Reduced from 30px */
+    flex: 1; /* Take up all remaining vertical space */
+    min-height: 0; /* Crucial: allows grid to shrink smaller than content if needed */
 }
 
 /* Cards (Panels) */
 .card {
     background: var(--surface-white);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 24px; /* Reduced from 32px */
     box-shadow: 0 10px 40px rgba(62, 84, 70, 0.04);
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px; /* Reduced from 24px */
+    min-height: 0; /* Allows card contents to squash */
 }
 
 .card-header, .translation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 .card-header h2, .section-title {
     font-size: 1.5rem;
@@ -116,7 +125,8 @@ h1, h2, h3 {
 .video-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 4/3;
+    flex: 1; /* Grow and shrink dynamically based on screen height */
+    min-height: 0; /* Replaces fixed aspect ratio */
     background: var(--accent-sand);
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -145,6 +155,7 @@ h1, h2, h3 {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
+    flex-shrink: 0;
 }
 .elegant-select {
     flex: 1;
@@ -180,12 +191,15 @@ h1, h2, h3 {
 }
 
 /* Prediction Display */
+.detection-wrapper {
+    flex-shrink: 0;
+}
 .gesture-display-box {
     background: var(--bg-cream);
     border-radius: var(--radius-md);
-    padding: 30px;
+    padding: 20px;
     text-align: center;
-    min-height: 140px;
+    min-height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -194,14 +208,14 @@ h1, h2, h3 {
 #prediction-display span:first-child {
     display: block;
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 600;
     color: var(--accent-forest);
     line-height: 1.1;
 }
 #prediction-display span:last-child {
     display: block;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-muted);
     margin-top: 5px;
 }
@@ -233,15 +247,24 @@ h1, h2, h3 {
 
 /* Translation Output */
 .translation-wrapper {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-.output-grid {
+    flex: 1; /* Fill remaining card height */
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+.output-grid {
+    flex: 1; /* Fill wrapper height */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.lang-box {
+    flex: 1; /* Fill grid height evenly */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 .lang-box label {
     display: block;
@@ -252,22 +275,25 @@ h1, h2, h3 {
     color: var(--text-muted);
     margin-bottom: 8px;
     padding-left: 5px;
+    flex-shrink: 0;
 }
 .text-window {
+    flex: 1; /* Take up all available space in the lang-box */
+    min-height: 0;
     background: var(--bg-cream);
     border: 1px solid var(--accent-sand);
     padding: 20px;
     border-radius: var(--radius-md);
-    min-height: 90px;
     font-size: 1.1rem;
     color: var(--text-dark);
+    overflow-y: auto; /* Allow internal scrolling if text overflows parent boundaries */
 }
 .placeholder-text { color: #A0A5A1; font-style: italic; }
 
 /* Buttons & Icons */
 .action-buttons { display: flex; gap: 8px; }
 .btn-icon {
-    width: 44px; height: 44px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     border: 1px solid var(--accent-sand);
     background: transparent;
@@ -304,7 +330,7 @@ h1, h2, h3 {
 /* Tablet Optimization */
 @media (max-width: 1024px) {
     .dashboard-layout { grid-template-columns: 1fr; }
-    .app-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .app-header { flex-direction: column; align-items: flex-start; gap: 10px; }
     .tagline { text-align: left; }
 }
 
@@ -374,7 +400,6 @@ h1, h2, h3 {
     }
 
     .video-container {
-        aspect-ratio: auto;
         height: 22vh; /* Responsive height based on view */
         min-height: 120px;
         max-height: 180px;
@@ -458,26 +483,6 @@ h1, h2, h3 {
         gap: 8px;
         flex: 1;
         min-height: 0;
-    }
-
-    .lang-box {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
-
-    .lang-box label {
-        font-size: 0.75rem;
-        margin-bottom: 4px;
-    }
-
-    .text-window {
-        min-height: 0;
-        flex: 1;
-        padding: 10px;
-        font-size: 0.9rem;
-        overflow-y: auto; /* Allows internal scrolling if text is too long, protecting parent container */
     }
 
     .btn-icon {
