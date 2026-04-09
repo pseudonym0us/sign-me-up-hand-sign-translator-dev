@@ -206,7 +206,6 @@ function onResults(results) {
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         
-        // 1. EVALUATE ALL DETECTED HANDS FOR PROMINENCE (SIZE)
         let evaluatedHands = [];
 
         for (let i = 0; i < results.multiHandLandmarks.length; i++) {
@@ -214,7 +213,6 @@ function onResults(results) {
             const handedness = results.multiHandedness[i];
             
             let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-            
             for (let lm of landmarks) {
                 if (lm.x < minX) minX = lm.x;
                 if (lm.x > maxX) maxX = lm.x;
@@ -222,76 +220,55 @@ function onResults(results) {
                 if (lm.y > maxY) maxY = lm.y;
             }
 
-            // The bounding box area serves as our proxy for "closeness/prominence"
             const area = (maxX - minX) * (maxY - minY);
             
             evaluatedHands.push({
+                originalIndex: i, 
                 landmarks: landmarks,
                 handedness: handedness,
-                area: area
+                maxX: maxX 
             });
         }
 
-        // 2. SORT BY AREA DESCENDING AND TAKE THE TOP 2
         evaluatedHands.sort((a, b) => b.area - a.area);
-        const topHands = evaluatedHands.slice(0, 2);
-        const numHands = topHands.length;
+        let topHands = evaluatedHands.slice(0, 2);
+        
+        topHands.sort((a, b) => a.originalIndex - b.originalIndex);
 
         let dataAux = [];
+        let x_ = [];
+        let y_ = [];
 
-        // 3. APPLY LOGIC TO THE PROMINENT HANDS
-        // CASE 1: Single hand detected (Apply left hand flip for alphabet)
-        if (numHands === 1) {
-            const landmarks = topHands[0].landmarks;
-            const handednessLabel = topHands[0].handedness.label;
-            const isLeftHand = handednessLabel === "Left";
-
+        for (let i = 0; i < topHands.length; i++) {
+            const handInfo = topHands[i];
+            const landmarks = handInfo.landmarks;
+            
             drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
             drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
 
-            let x_ = landmarks.map(lm => lm.x);
-            let y_ = landmarks.map(lm => lm.y);
-            
-            let minX = Math.min(...x_);
-            let maxX = Math.max(...x_);
-            let minY = Math.min(...y_);
+            for (let lm of landmarks) {
+                x_.push(lm.x);
+                y_.push(lm.y);
+            }
+
+            let globalMinX = Math.min(...x_);
+            let globalMinY = Math.min(...y_);
+
+            // Swapped logic: We target "Right" because the mirrored camera 
+            // mislabels the physical Left hand as Right.
+            const applyMirrorFlip = (topHands.length === 1 && handInfo.handedness.label === "Right");
 
             for (let lm of landmarks) {
-                let normalizedX = isLeftHand ? (maxX - lm.x) : (lm.x - minX);
-                dataAux.push(normalizedX);
-                dataAux.push(lm.y - minY);
-            }
-        } 
-        // CASE 2: Two hands detected (Preserve original spatial relationship)
-        else {
-            let x_ = [];
-            let y_ = [];
-
-            for (let i = 0; i < 2; i++) {
-                const landmarks = topHands[i].landmarks;
-                
-                drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
-                drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
-
-                for (let lm of landmarks) {
-                    x_.push(lm.x);
-                    y_.push(lm.y);
-                }
-            }
-
-            let minX = Math.min(...x_);
-            let minY = Math.min(...y_);
-
-            for (let i = 0; i < 2; i++) {
-                const landmarks = topHands[i].landmarks;
-                for (let lm of landmarks) {
-                    dataAux.push(lm.x - minX);
-                    dataAux.push(lm.y - minY);
+                if (applyMirrorFlip) {
+                    dataAux.push(handInfo.maxX - lm.x);
+                    dataAux.push(lm.y - globalMinY);
+                } else {
+                    dataAux.push(lm.x - globalMinX);
+                    dataAux.push(lm.y - globalMinY);
                 }
             }
         }
 
-        // Pad with zeros to match the expected 84 input features
         while (dataAux.length < 84) {
             dataAux.push(0.0);
         }
