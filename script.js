@@ -202,79 +202,84 @@ function onResults(results) {
 
     ctx.save();
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    // This draws the raw, unmirrored camera feed
     ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         
+        // 1. EVALUATE ALL HANDS FOR SIZE/PROMINENCE
         let evaluatedHands = [];
-
         for (let i = 0; i < results.multiHandLandmarks.length; i++) {
             const landmarks = results.multiHandLandmarks[i];
-            const handedness = results.multiHandedness[i];
-            
             let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            
             for (let lm of landmarks) {
                 if (lm.x < minX) minX = lm.x;
                 if (lm.x > maxX) maxX = lm.x;
                 if (lm.y < minY) minY = lm.y;
                 if (lm.y > maxY) maxY = lm.y;
             }
-
-            const area = (maxX - minX) * (maxY - minY);
             
             evaluatedHands.push({
                 originalIndex: i, 
                 landmarks: landmarks,
-                handedness: handedness,
-                maxX: maxX 
+                area: (maxX - minX) * (maxY - minY),
+                handedness: results.multiHandedness[i].label
             });
         }
 
+        // 2. FILTER TOP 2 HANDS AND RESTORE ARRAY ORDER
         evaluatedHands.sort((a, b) => b.area - a.area);
         let topHands = evaluatedHands.slice(0, 2);
-        
         topHands.sort((a, b) => a.originalIndex - b.originalIndex);
 
-        let dataAux = [];
-        let x_ = [];
-        let y_ = [];
-
-        for (let i = 0; i < topHands.length; i++) {
-            const handInfo = topHands[i];
-            const landmarks = handInfo.landmarks;
-            
-            drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
-            drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
-
-            for (let lm of landmarks) {
-                x_.push(lm.x);
-                y_.push(lm.y);
+        // 3. CALCULATE GLOBAL BOUNDARIES FOR NORMALISATION
+        let allX = [];
+        let allY = [];
+        for (let hand of topHands) {
+            for (let lm of hand.landmarks) {
+                allX.push(lm.x);
+                allY.push(lm.y);
             }
+        }
+        let globalMinX = Math.min(...allX);
+        let globalMaxX = Math.max(...allX);
+        let globalMinY = Math.min(...allY);
 
-            let globalMinX = Math.min(...x_);
-            let globalMinY = Math.min(...y_);
+        // 4. APPLY THE GEOMETRY FIX
+        // Check if there is only one hand, and if it is physically a left hand.
+        let isSingleLeftHand = (topHands.length === 1 && topHands[0].handedness === "Left");
 
-            // Swapped logic: We target "Right" because the mirrored camera 
-            // mislabels the physical Left hand as Right.
-            const applyMirrorFlip = (topHands.length === 1 && handInfo.handedness.label === "Right");
+        let dataAux = [];
+        
+        for (let hand of topHands) {
+            drawConnectors(ctx, hand.landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
+            drawLandmarks(ctx, hand.landmarks, {color: '#3F4EEF', lineWidth: 2});
 
-            for (let lm of landmarks) {
-                if (applyMirrorFlip) {
-                    dataAux.push(handInfo.maxX - lm.x);
-                    dataAux.push(lm.y - globalMinY);
+            for (let lm of hand.landmarks) {
+                let normalizedX;
+                let normalizedY = lm.y - globalMinY;
+
+                if (isSingleLeftHand) {
+                    // Left hand geometry already matches your mirrored training data. Do not flip.
+                    normalizedX = lm.x - globalMinX;
                 } else {
-                    dataAux.push(lm.x - globalMinX);
-                    dataAux.push(lm.y - globalMinY);
+                    // Right hand (and two-handed signs) must be flipped to match training data.
+                    // (globalMaxX - lm.x) inherently reflects the hand and sets the minimum X to 0.
+                    normalizedX = globalMaxX - lm.x;
                 }
+
+                dataAux.push(normalizedX);
+                dataAux.push(normalizedY);
             }
         }
 
+        // Pad with zeros to match the expected 84 input features
         while (dataAux.length < 84) {
             dataAux.push(0.0);
         }
 
-        const inputFeatures = dataAux.slice(0, 84);
-        runInference(inputFeatures);
+        runInference(dataAux.slice(0, 84));
 
     } else {
         handleNoHand();
