@@ -1,24 +1,38 @@
+// Application Configuration and Model Thresholds
+const VIDEO_WIDTH = 1280;
+const VIDEO_HEIGHT = 720;
+const MAX_HANDS = 2;
+const MODEL_COMPLEXITY = 1;
+const MIN_DETECTION_CONFIDENCE = 0.5;
+const MIN_TRACKING_CONFIDENCE = 0.5;
+const NUM_FEATURES = 84; // Expected input size for the ONNX model
+const STABILITY_THRESHOLD = 12; // Frames required to confirm a sign
+const RESET_THRESHOLD = 20; // Frames without hands before resetting output
+const CONFIDENCE_THRESHOLD = 0.4;
+const CONFIDENCE_MULTIPLIER = 1.4;
+const MAX_VISUAL_CONFIDENCE = 0.99;
+const LINE_WIDTH_CONNECTOR = 4;
+const LINE_WIDTH_LANDMARK = 2;
+const SPEECH_RATE = 1.0;
+const SPEECH_PITCH = 1.0;
+
+// DOM Elements
 const videoElement = document.getElementById('input_video');
 const canvasElement = document.getElementById('output_canvas');
 const ctx = canvasElement.getContext('2d');
 const predictionDisplay = document.getElementById('prediction-display');
-
-// NEW: Grab separate outputs
 const outputEn = document.getElementById('output-en');
 const outputMs = document.getElementById('output-ms');
-
 const startBtn = document.getElementById('start-btn');
 const deviceSelect = document.getElementById('device-select');
 const loadingSpinner = document.getElementById('loading-spinner');
 const cameraPlaceholder = document.getElementById('camera-placeholder');
-
 const confContainer = document.getElementById('confidence-bar-container');
 const confValue = document.getElementById('conf-value');
 const confFill = document.getElementById('conf-fill');
 
-// --- 1. CONFIGURATION ---
-
-const labels_map = {
+// Sign Language to Text Mappings
+const LABELS_MAP = {
     0: "A", 1: "B", 2: "C", 3: "D", 4: "E", 5: "F", 6: "G", 7: "H", 8: "I", 9: "J", 
     10: "K", 11: "L", 12: "M", 13: "N", 14: "O", 15: "P", 16: "Q", 17: "R", 18: "S", 
     19: "T", 20: "U", 21: "V", 22: "W", 23: "X", 24: "Y", 25: "Z_0", 26: "Z_1", 
@@ -28,7 +42,7 @@ const labels_map = {
     41: "Morning", 42: "Please (Welcome)", 43: "Thank you", 44: "Please (Help)"
 };
 
-const malay_mapping = {
+const MALAY_MAPPING = {
     "A": "A", "B": "B", "C": "C", "D": "D", "E": "E", "F": "F", "G": "G", "H": "H", "I": "I", "J": "J",
     "K": "K", "L": "L", "M": "M", "N": "N", "O": "O", "P": "P", "Q": "Q", "R": "R", "S": "S",
     "T": "T", "U": "U", "V": "V", "W": "W", "X": "X", "Y": "Y", "Z_0": "Z", "Z_1": "Z",
@@ -57,9 +71,10 @@ const malay_mapping = {
     "Welcome": "Selamat Datang"
 };
 
-const hidden_signs = new Set(["How are you?"]);
-const modifiers = { "J": "I", "Please (Welcome)": "Goodbye" };
-const activators = {
+// Grammar and Sequence Rules
+const HIDDEN_SIGNS = new Set(["How are you?"]);
+const MODIFIERS = { "J": "I", "Please (Welcome)": "Goodbye" }; // Requires a previous specific sign to activate
+const ACTIVATORS = { // Merges two separate signs into a single phrase
     "Hello|Waalaikumussalam": "Assalamualaikum",
     "Well|Morning": "Good Morning",
     "Well|Night": "Good Night",
@@ -68,26 +83,19 @@ const activators = {
     "How are you?|I'm fine": "How are you?"
 };
 
+// Application State
 let onnxSession;
 let inputName = "float_input";
 let camera = null;
 let isCameraRunning = false;
-
-// --- STATE MANAGEMENT ---
 let previousPrediction = null;
 let consecutiveFrames = 0;
 let nothingConsecutiveFrames = 0;
-
-const STABILITY_THRESHOLD = 12; 
-const RESET_THRESHOLD = 20;
-
 let lastPrintedChar = null;
 let lastValidEntry = null;
 let wasLastHidden = false;
 let currentSequenceBase = null;
 let sequenceStep = -1;
-
-// History Array: [{ en: "Hello", ms: "Helo", isLetter: false }, ...]
 let sentenceHistory = []; 
 let lastTypeWasLetter = false;
 
@@ -99,37 +107,29 @@ function getLastEntry() {
 function removeLastEntry() {
     if (sentenceHistory.length > 0) {
         sentenceHistory.pop();
-        if (sentenceHistory.length > 0) {
-            lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
-        } else {
-            lastTypeWasLetter = false;
-        }
+        lastTypeWasLetter = sentenceHistory.length > 0 ? sentenceHistory[sentenceHistory.length - 1].isLetter : false;
     }
 }
 
-// --- INITIALIZATION ---
 async function init() {
     await loadModel();
     await getCameras();
     renderBuffer();
 }
 
-// --- LOAD MODEL ---
 async function loadModel() {
     try {
         loadingSpinner.classList.remove('hidden');
         ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
         onnxSession = await ort.InferenceSession.create('./model.onnx');
         inputName = onnxSession.inputNames[0];
-        console.log("Model loaded");
         loadingSpinner.classList.add('hidden');
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        console.error(error);
         alert("Error loading model.onnx");
     }
 }
 
-// --- CAMERA HANDLING ---
 async function getCameras() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -142,8 +142,8 @@ async function getCameras() {
             option.text = device.label || `Camera ${deviceSelect.length}`;
             deviceSelect.appendChild(option);
         });
-    } catch (e) {
-        console.error("Error fetching cameras:", e);
+    } catch (error) {
+        console.error("Error fetching cameras:", error);
     }
 }
 
@@ -168,8 +168,8 @@ function startCamera() {
         onFrame: async () => {
             await hands.send({image: videoElement});
         },
-        width: { ideal: 1280 }, 
-        height: { ideal: 720 } 
+        width: { ideal: VIDEO_WIDTH }, 
+        height: { ideal: VIDEO_HEIGHT } 
     });
 
     camera.start().then(() => {
@@ -187,14 +187,20 @@ function stopCamera() {
     }
 }
 
-// --- PREDICTION LOOP ---
+// MediaPipe Setup
 const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-hands.setOptions({maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5});
+hands.setOptions({
+    maxNumHands: MAX_HANDS, 
+    modelComplexity: MODEL_COMPLEXITY, 
+    minDetectionConfidence: MIN_DETECTION_CONFIDENCE, 
+    minTrackingConfidence: MIN_TRACKING_CONFIDENCE
+});
 hands.onResults(onResults);
 
 function onResults(results) {
     const videoWidth = results.image.width;
     const videoHeight = results.image.height;
+    
     if (canvasElement.width !== videoWidth || canvasElement.height !== videoHeight) {
         canvasElement.width = videoWidth;
         canvasElement.height = videoHeight;
@@ -202,13 +208,12 @@ function onResults(results) {
 
     ctx.save();
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    // This draws the raw, unmirrored camera feed
     ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        
-        // 1. EVALUATE ALL HANDS FOR SIZE/PROMINENCE
         let evaluatedHands = [];
+        
+        // Evaluate all hands to find the most prominent ones based on bounding box area
         for (let i = 0; i < results.multiHandLandmarks.length; i++) {
             const landmarks = results.multiHandLandmarks[i];
             let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -228,12 +233,11 @@ function onResults(results) {
             });
         }
 
-        // 2. FILTER TOP 2 HANDS AND RESTORE ARRAY ORDER
         evaluatedHands.sort((a, b) => b.area - a.area);
-        let topHands = evaluatedHands.slice(0, 2);
+        let topHands = evaluatedHands.slice(0, MAX_HANDS);
         topHands.sort((a, b) => a.originalIndex - b.originalIndex);
 
-        // 3. CALCULATE GLOBAL BOUNDARIES FOR NORMALISATION
+        // Calculate global boundaries to normalise the dataset
         let allX = [];
         let allY = [];
         for (let hand of topHands) {
@@ -246,40 +250,36 @@ function onResults(results) {
         let globalMaxX = Math.max(...allX);
         let globalMinY = Math.min(...allY);
 
-        // 4. APPLY THE GEOMETRY FIX
-        // Check if there is only one hand, and if it is physically a left hand.
         let isSingleLeftHand = (topHands.length === 1 && topHands[0].handedness === "Left");
-
-        let dataAux = [];
+        let normalizedFeatures = [];
         
         for (let hand of topHands) {
-            drawConnectors(ctx, hand.landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
-            drawLandmarks(ctx, hand.landmarks, {color: '#3F4EEF', lineWidth: 2});
+            drawConnectors(ctx, hand.landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: LINE_WIDTH_CONNECTOR});
+            drawLandmarks(ctx, hand.landmarks, {color: '#3F4EEF', lineWidth: LINE_WIDTH_LANDMARK});
 
             for (let lm of hand.landmarks) {
                 let normalizedX;
                 let normalizedY = lm.y - globalMinY;
 
+                // Geometry normalisation: Left hand geometry matches mirrored training data.
+                // Right hand (and two-handed signs) must be flipped to match.
                 if (isSingleLeftHand) {
-                    // Left hand geometry already matches your mirrored training data. Do not flip.
                     normalizedX = lm.x - globalMinX;
                 } else {
-                    // Right hand (and two-handed signs) must be flipped to match training data.
-                    // (globalMaxX - lm.x) inherently reflects the hand and sets the minimum X to 0.
                     normalizedX = globalMaxX - lm.x;
                 }
 
-                dataAux.push(normalizedX);
-                dataAux.push(normalizedY);
+                normalizedFeatures.push(normalizedX);
+                normalizedFeatures.push(normalizedY);
             }
         }
 
-        // Pad with zeros to match the expected 84 input features
-        while (dataAux.length < 84) {
-            dataAux.push(0.0);
+        // Pad with zeros to ensure the model always receives exactly 84 features
+        while (normalizedFeatures.length < NUM_FEATURES) {
+            normalizedFeatures.push(0.0);
         }
 
-        runInference(dataAux.slice(0, 84));
+        runInference(normalizedFeatures.slice(0, NUM_FEATURES));
 
     } else {
         handleNoHand();
@@ -290,39 +290,34 @@ function onResults(results) {
 async function runInference(features) {
     if (!onnxSession) return;
     try {
-        const inputTensor = new ort.Tensor('float32', Float32Array.from(features), [1, 84]);
+        const inputTensor = new ort.Tensor('float32', Float32Array.from(features), [1, NUM_FEATURES]);
         const feeds = {};
         feeds[inputName] = inputTensor;
 
         const results = await onnxSession.run(feeds);
         const labelIdx = Number(results[onnxSession.outputNames[0]].data[0]);
         
-        let confidence = 0.0;
-        if(results[onnxSession.outputNames[1]]) {
-            confidence = results[onnxSession.outputNames[1]].data[labelIdx];
-        } else {
-            confidence = 1.0; 
-        }
-
+        let confidence = results[onnxSession.outputNames[1]] ? results[onnxSession.outputNames[1]].data[labelIdx] : 1.0;
         let visualConfidence = confidence;
-        if (confidence > 0.4) {
-            visualConfidence = Math.min(confidence * 1.4, 0.99);
+        
+        // Artificially boost the visual confidence bar if above the baseline threshold
+        if (confidence > CONFIDENCE_THRESHOLD) {
+            visualConfidence = Math.min(confidence * CONFIDENCE_MULTIPLIER, MAX_VISUAL_CONFIDENCE);
         }
 
-        const label = labels_map[labelIdx];
+        const label = LABELS_MAP[labelIdx];
         handleLogic(label, visualConfidence);
 
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        console.error(error);
     }
 }
 
-// --- LOGIC ENGINE ---
 function handleLogic(predictedLabel, confidence) {
     nothingConsecutiveFrames = 0;
     updateConfidenceBar(confidence);
 
-    let malayText = malay_mapping[predictedLabel] || predictedLabel;
+    let malayText = MALAY_MAPPING[predictedLabel] || predictedLabel;
     predictionDisplay.innerHTML = `<span>${predictedLabel}</span><span class="malay-text">${malayText}</span>`;
 
     if (predictedLabel === previousPrediction) {
@@ -332,10 +327,11 @@ function handleLogic(predictedLabel, confidence) {
         previousPrediction = predictedLabel;
     }
 
+    // Only process the sign if it has been held stably for the required number of frames
     if (consecutiveFrames === STABILITY_THRESHOLD) {
         
-        // Z Logic
-        if (predictedLabel.includes("_") && !hidden_signs.has(predictedLabel)) {
+        // Handle multi-step dynamic signs (e.g., drawing a 'Z' in the air)
+        if (predictedLabel.includes("_") && !HIDDEN_SIGNS.has(predictedLabel)) {
             let parts = predictedLabel.split("_");
             let baseName = parts[0];
             let step = parseInt(parts[1]);
@@ -355,9 +351,10 @@ function handleLogic(predictedLabel, confidence) {
             currentSequenceBase = null;
             sequenceStep = -1;
 
+            // Prevent spamming the same character repeatedly
             if (predictedLabel !== lastPrintedChar) {
                 
-                if (hidden_signs.has(predictedLabel)) {
+                if (HIDDEN_SIGNS.has(predictedLabel)) {
                     lastValidEntry = predictedLabel;
                     wasLastHidden = true;
                     lastPrintedChar = predictedLabel;
@@ -365,15 +362,13 @@ function handleLogic(predictedLabel, confidence) {
                     let shouldPrint = true;
                     let isModifierReplace = false;
 
-                    // --- 1. MODIFIER CHECK ---
-                    if (modifiers[predictedLabel]) {
-                        let required = modifiers[predictedLabel];
+                    // Modifier logic: Check if the current sign needs to overwrite the previous one
+                    if (MODIFIERS[predictedLabel]) {
+                        let required = MODIFIERS[predictedLabel];
                         
-                        // Check if it's a single letter (I -> J)
                         if (required.length === 1) {
                             if (sentenceHistory.length > 0) {
                                 let lastItem = sentenceHistory[sentenceHistory.length - 1];
-                                // Check if spelling block ends with required letter (Case Insensitive)
                                 if (lastItem.isLetter && lastItem.en.toUpperCase().endsWith(required)) {
                                     isModifierReplace = true;
                                 } else {
@@ -382,9 +377,7 @@ function handleLogic(predictedLabel, confidence) {
                             } else {
                                 shouldPrint = false;
                             }
-                        } 
-                        // Normal word check
-                        else {
+                        } else {
                             if (lastValidEntry === required) {
                                 isModifierReplace = true;
                             } else {
@@ -396,23 +389,19 @@ function handleLogic(predictedLabel, confidence) {
                     if (shouldPrint) {
                         let comboKey = lastValidEntry + "|" + predictedLabel;
                         
-                        // 2. Activator Check (Merging)
-                        if (activators[comboKey]) {
-                            let newWord = activators[comboKey];
+                        // Activator logic: Merge two distinct signs into a single new phrase
+                        if (ACTIVATORS[comboKey]) {
+                            let newWord = ACTIVATORS[comboKey];
                             removeLastSign(); 
                             addToSentence(newWord);
                             lastValidEntry = newWord;
                             wasLastHidden = false;
-                        } 
-                        // 3. Modifier Replacement
-                        else if (isModifierReplace) {
+                        } else if (isModifierReplace) {
                             removeLastSign(); 
                             addToSentence(predictedLabel); 
                             lastValidEntry = predictedLabel;
                             wasLastHidden = false;
-                        } 
-                        // 4. Standard Print
-                        else {
+                        } else {
                             addToSentence(predictedLabel);
                             lastValidEntry = predictedLabel;
                             wasLastHidden = false;
@@ -426,31 +415,23 @@ function handleLogic(predictedLabel, confidence) {
 }
 
 function removeLastSign() {
-    if (sentenceHistory.length === 0) return;
-    if (wasLastHidden) return;
+    if (sentenceHistory.length === 0 || wasLastHidden) return;
 
     let lastIdx = sentenceHistory.length - 1;
     let item = sentenceHistory[lastIdx];
 
+    // If removing from a spelled word, just pop the last letter rather than the whole block
     if (item.isLetter && item.en.length > 0) {
         item.en = item.en.slice(0, -1);
         item.ms = item.ms.slice(0, -1);
         
         if (item.en.length === 0) {
             sentenceHistory.pop();
-            if (sentenceHistory.length > 0) {
-                lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
-            } else {
-                lastTypeWasLetter = false;
-            }
+            lastTypeWasLetter = sentenceHistory.length > 0 ? sentenceHistory[sentenceHistory.length - 1].isLetter : false;
         }
     } else {
         sentenceHistory.pop();
-        if (sentenceHistory.length > 0) {
-            lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
-        } else {
-            lastTypeWasLetter = false;
-        }
+        lastTypeWasLetter = sentenceHistory.length > 0 ? sentenceHistory[sentenceHistory.length - 1].isLetter : false;
     }
     renderBuffer();
 }
@@ -464,30 +445,24 @@ function handleNoHand() {
     }
 }
 
-// --- UI HELPERS ---
-
 function updateConfidenceBar(confidence) {
     const percentage = Math.round(confidence * 100);
     confValue.innerText = `${percentage}%`;
     confFill.style.width = `${percentage}%`;
 }
 
-// --- BILINGUAL SENTENCE LOGIC ---
-
 function addToSentence(text) {
     const isLetter = (text.length === 1 && text.match(/[A-Z]/i));
-    
     let enText = text;
-    let msText = malay_mapping[text] || text; 
+    let msText = MALAY_MAPPING[text] || text; 
 
+    // Group consecutive single letters together into a spelling block
     if (isLetter) {
         if (lastTypeWasLetter && sentenceHistory.length > 0) {
-            // MERGE (Spelling): Append letter to existing word
             let lastIdx = sentenceHistory.length - 1;
             sentenceHistory[lastIdx].en += enText.toLowerCase();
             sentenceHistory[lastIdx].ms += enText.toLowerCase(); 
         } else {
-            // NEW LETTER BLOCK
             sentenceHistory.push({ 
                 en: enText.toUpperCase(), 
                 ms: enText.toUpperCase(), 
@@ -496,7 +471,6 @@ function addToSentence(text) {
         }
         lastTypeWasLetter = true;
     } else {
-        // NEW WORD/PHRASE
         sentenceHistory.push({ 
             en: enText, 
             ms: msText, 
@@ -514,20 +488,12 @@ function handleBackspace() {
     let lastIdx = sentenceHistory.length - 1;
     let item = sentenceHistory[lastIdx];
 
-    // LOGIC: Delete entire word if phrase, single letter if spelled
     if (item.isLetter && item.en.length > 1) {
         item.en = item.en.slice(0, -1);
         item.ms = item.ms.slice(0, -1);
     } else {
-        // Remove the whole object
         sentenceHistory.pop();
-        
-        // Reset state for concatenation
-        if (sentenceHistory.length > 0) {
-            lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
-        } else {
-            lastTypeWasLetter = false;
-        }
+        lastTypeWasLetter = sentenceHistory.length > 0 ? sentenceHistory[sentenceHistory.length - 1].isLetter : false;
     }
     renderBuffer();
 }
@@ -539,11 +505,7 @@ function removeSpecificEntry(entry) {
 
     if (lastItem.en === entry || lastItem.en === entry.toUpperCase()) {
         sentenceHistory.pop();
-        if (sentenceHistory.length > 0) {
-            lastTypeWasLetter = sentenceHistory[sentenceHistory.length - 1].isLetter;
-        } else {
-            lastTypeWasLetter = false;
-        }
+        lastTypeWasLetter = sentenceHistory.length > 0 ? sentenceHistory[sentenceHistory.length - 1].isLetter : false;
     }
     renderBuffer();
 }
@@ -562,41 +524,29 @@ function renderBuffer() {
         return;
     }
 
-    const enLine = sentenceHistory.map(item => item.en).join(" ");
-    const msLine = sentenceHistory.map(item => item.ms).join(" ");
-
-    outputEn.innerText = enLine;
-    outputMs.innerText = msLine;
+    outputEn.innerText = sentenceHistory.map(item => item.en).join(" ");
+    outputMs.innerText = sentenceHistory.map(item => item.ms).join(" ");
     
-    // Auto scroll both
     outputEn.scrollTop = outputEn.scrollHeight;
     outputMs.scrollTop = outputMs.scrollHeight;
 }
 
-// --- TEXT TO SPEECH ---
 function speakText(languageCode) {
     if (sentenceHistory.length === 0) return;
 
-    // Stop any ongoing speech
     window.speechSynthesis.cancel();
-
-    // Determine which text to read based on the requested language
     const textToSpeak = sentenceHistory.map(item => item[languageCode]).join(" ");
-    
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
-    // Set the appropriate accent and pronunciation rules
     if (languageCode === 'en') {
         utterance.lang = 'en-GB'; 
     } else if (languageCode === 'ms') {
         utterance.lang = 'ms-MY';
     }
 
-    utterance.rate = 1.0; 
-    utterance.pitch = 1.0;
-
+    utterance.rate = SPEECH_RATE; 
+    utterance.pitch = SPEECH_PITCH;
     window.speechSynthesis.speak(utterance);
 }
 
-// Run Init
 init();

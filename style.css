@@ -1,24 +1,35 @@
-/* === MAXIMA THERAPY INSPIRED THEME === */
+/* ==========================================================================
+   THEME CONFIGURATION
+   Global design tokens for colours, typography, and border radii.
+   ========================================================================== */
 :root {
-    /* Soft, organic colour palette */
+    /* Base Palette */
     --bg-cream: #F5F3EF;
     --surface-white: #FFFFFF;
     --text-dark: #2C332D;
     --text-muted: #79827B;
     
-    /* Warm & Soothing Accents */
+    /* Brand Accents */
     --accent-terracotta: #D8755B;
     --accent-terracotta-hover: #C2634B;
     --accent-forest: #3E5446;
     --accent-sand: #E8E4DB;
     
+    /* Structural Radii */
     --radius-lg: 32px;
     --radius-md: 20px;
     --radius-sm: 12px;
     --radius-pill: 100px;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ==========================================================================
+   BASE & RESETS
+   ========================================================================== */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
 
 body {
     background-color: var(--bg-cream);
@@ -26,15 +37,20 @@ body {
     font-family: "Poppins", sans-serif;
     font-weight: 600;
     font-style: normal;
-    height: 100vh; /* Strictly limit to viewport height */
-    overflow: hidden; /* Prevent all vertical scrolling */
+    line-height: 1.5;
+    
+    /* Viewport Constraint: Prevents all vertical scrolling for an app-like feel */
+    height: 100vh; 
+    overflow: hidden; 
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px; /* Reduced padding to maximise screen real estate */
-    line-height: 1.5;
+    padding: 20px; 
 }
 
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
 h1, h2, h3 {
     font-family: "Poppins", sans-serif;
     font-weight: 600;
@@ -42,29 +58,34 @@ h1, h2, h3 {
     color: var(--accent-forest);
 }
 
+/* ==========================================================================
+   MAIN LAYOUT ARCHITECTURE
+   ========================================================================== */
 .app-wrapper {
     width: 100%;
-    height: 100%; /* Fill available body height */
+    height: 100%; 
     max-width: 1280px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
 }
 
-/* Header */
+/* App Header & Branding */
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 20px; /* Reduced from 40px */
+    margin-bottom: 20px;
     padding: 0 10px;
-    flex-shrink: 0; /* Prevent header from squashing */
+    flex-shrink: 0; 
 }
+
 .brand {
     display: flex;
     align-items: center;
     gap: 16px;
 }
+
 .brand-icon {
     background: var(--surface-white);
     font-size: 1.8rem;
@@ -72,6 +93,7 @@ h1, h2, h3 {
     border-radius: 50%;
     box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
+
 .app-header h1 {
     font-size: 2.8rem;
     font-family: 'Erica One', sans-serif;
@@ -79,6 +101,7 @@ h1, h2, h3 {
     letter-spacing: -0.5px;
     color: var(--accent-terracotta);
 }
+
 .tagline {
     font-size: 1.1rem;
     color: var(--text-muted);
@@ -86,36 +109,43 @@ h1, h2, h3 {
     text-align: right;
 }
 
-/* Layout Grid */
+/* Core Split Layout */
 .dashboard-layout {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
-    gap: 20px; /* Reduced from 30px */
-    flex: 1; /* Take up all remaining vertical space */
-    min-height: 0; /* Crucial: allows grid to shrink smaller than content if needed */
+    gap: 20px; 
+    flex: 1; 
+    min-height: 0; /* Enables the grid to shrink smaller than its content if constrained */
 }
 
-/* Cards (Panels) */
+/* ==========================================================================
+   COMPONENT: UI CARDS
+   Standardized panels for housing application sections.
+   ========================================================================== */
 .card {
     background: var(--surface-white);
     border-radius: var(--radius-lg);
-    padding: 24px; /* Reduced from 32px */
+    padding: 24px; 
     box-shadow: 0 10px 40px rgba(62, 84, 70, 0.04);
     display: flex;
     flex-direction: column;
-    gap: 16px; /* Reduced from 24px */
-    min-height: 0; /* Allows card contents to squash */
+    gap: 16px; 
+    min-height: 0; 
 }
 
-.card-header, .translation-header {
+.card-header, 
+.translation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
 }
-.card-header h2, .section-title {
+
+.card-header h2, 
+.section-title {
     font-size: 1.5rem;
 }
+
 .status-pill {
     background: var(--accent-sand);
     color: var(--accent-forest);
@@ -127,21 +157,32 @@ h1, h2, h3 {
     letter-spacing: 0.5px;
 }
 
-/* Video Section */
+/* ==========================================================================
+   COMPONENT: OPTICAL INPUT (CAMERA & CANVAS)
+   ========================================================================== */
 .video-container {
     position: relative;
     width: 100%;
-    flex: 1; /* Grow and shrink dynamically based on screen height */
-    min-height: 0; /* Replaces fixed aspect ratio */
+    flex: 1; 
+    min-height: 0; 
     background: var(--accent-sand);
     border-radius: var(--radius-md);
     overflow: hidden;
 }
-#input_video, #output_canvas {
-    position: absolute; width: 100%; height: 100%; object-fit: cover;
-}
-#output_canvas { z-index: 5; }
 
+#input_video, 
+#output_canvas {
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+}
+
+#output_canvas { 
+    z-index: 5; 
+}
+
+/* Paused / Inactive State Overlay */
 .overlay-state {
     position: absolute;
     inset: 0;
@@ -153,16 +194,27 @@ h1, h2, h3 {
     z-index: 10;
     text-align: center;
 }
-.overlay-text h3 { font-size: 1.8rem; margin-bottom: 8px; }
-.overlay-text p { color: var(--text-muted); font-size: 1rem; }
 
-/* Controls */
+.overlay-text h3 { 
+    font-size: 1.8rem; 
+    margin-bottom: 8px; 
+}
+
+.overlay-text p { 
+    color: var(--text-muted); 
+    font-size: 1rem; 
+}
+
+/* ==========================================================================
+   COMPONENT: DEVICE CONTROLS
+   ========================================================================== */
 .controls-container {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
     flex-shrink: 0;
 }
+
 .elegant-select {
     flex: 1;
     min-width: 200px;
@@ -173,12 +225,12 @@ h1, h2, h3 {
     border-radius: var(--radius-pill);
     font-family: "Poppins", sans-serif;
     font-weight: 600;
-    font-style: normal;
     font-size: 1rem;
     color: var(--text-dark);
     cursor: pointer;
     outline: none;
 }
+
 .btn-primary {
     flex: 1;
     min-width: 150px;
@@ -192,16 +244,20 @@ h1, h2, h3 {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .btn-primary:hover {
     background: var(--accent-terracotta-hover);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(216, 117, 91, 0.2);
 }
 
-/* Prediction Display */
+/* ==========================================================================
+   COMPONENT: REAL-TIME GESTURE DETECTION UI
+   ========================================================================== */
 .detection-wrapper {
     flex-shrink: 0;
 }
+
 .gesture-display-box {
     background: var(--bg-cream);
     border-radius: var(--radius-md);
@@ -216,6 +272,7 @@ h1, h2, h3 {
     overflow: hidden;
     container-type: inline-size;
 }
+
 #prediction-display {
     width: 100%;
     display: flex;
@@ -223,19 +280,21 @@ h1, h2, h3 {
     align-items: center;
     overflow: hidden;
 }
+
+/* Primary translated text */
 #prediction-display span:first-child {
     display: block;
     font-family: "Poppins", sans-serif;
     font-weight: 600;
-    font-style: normal;
     font-size: clamp(1rem, 8cqw, 2.8rem); 
     color: var(--accent-forest);
     line-height: 1.1;
-    
     white-space: normal;
     word-wrap: break-word;
     width: 100%;
 }
+
+/* Secondary (Malay) translated text */
 #prediction-display span:last-child {
     display: block;
     font-size: 1rem;
@@ -243,8 +302,11 @@ h1, h2, h3 {
     margin-top: 5px;
 }
 
-/* Confidence Bar */
-.confidence-tracker { margin-top: 15px; }
+/* AI Model Confidence Bar */
+.confidence-tracker { 
+    margin-top: 15px; 
+}
+
 .confidence-header {
     display: flex;
     justify-content: space-between;
@@ -253,13 +315,20 @@ h1, h2, h3 {
     color: var(--text-muted);
     margin-bottom: 8px;
 }
-.conf-percentage { color: var(--accent-forest); font-weight: 600; }
+
+.conf-percentage { 
+    color: var(--accent-forest); 
+    font-weight: 600; 
+}
+
 .progress-track {
-    width: 100%; height: 6px;
+    width: 100%; 
+    height: 6px;
     background: var(--accent-sand);
     border-radius: var(--radius-pill);
     overflow: hidden;
 }
+
 .progress-fill {
     height: 100%;
     background: var(--accent-forest);
@@ -268,29 +337,33 @@ h1, h2, h3 {
     border-radius: var(--radius-pill);
 }
 
-/* Translation Output */
+/* ==========================================================================
+   COMPONENT: TRANSLATION HISTORY & OUTPUT UI
+   ========================================================================== */
 .translation-wrapper {
-    flex: 1; /* Fill remaining card height */
+    flex: 1; 
     min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
+
 .output-grid {
-    flex: 1; /* Fill wrapper height */
+    flex: 1; 
     min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
+
 .lang-box {
-    flex: 1; /* Fill grid height evenly */
+    flex: 1; 
     min-height: 0;
     display: flex;
     flex-direction: column;
 }
 
-/* Language Headers & Speak Buttons */
+/* Language Box Headers */
 .lang-header {
     display: flex;
     justify-content: space-between;
@@ -298,6 +371,7 @@ h1, h2, h3 {
     margin-bottom: 8px;
     padding-right: 4px;
 }
+
 .lang-header label {
     margin-bottom: 0;
     display: block;
@@ -309,22 +383,7 @@ h1, h2, h3 {
     padding-left: 5px;
 }
 
-.speak-btn {
-    width: 32px;
-    height: 32px;
-    background: var(--surface-white);
-    color: var(--accent-terracotta);
-    border-color: var(--accent-terracotta);
-}
-.speak-btn:hover {
-    background: var(--accent-terracotta);
-    color: var(--surface-white);
-}
-.speak-btn svg {
-    width: 16px;
-    height: 16px;
-}
-
+/* Main Text Display Area */
 .text-window {
     flex: 1; 
     min-height: 0;
@@ -335,66 +394,115 @@ h1, h2, h3 {
     color: var(--text-dark);
     overflow-y: auto;
     overflow-x: hidden;
-    word-wrap: break-word; /* Forces long unbroken text to wrap */
+    word-wrap: break-word; 
     container-type: inline-size;
 }
 
 .text-window span {
-    /* Optional: allow output text to scale slightly based on box size */
     font-size: clamp(0.9rem, 5cqw, 1.1rem);
 }
-.placeholder-text { color: #A0A5A1; font-style: italic; }
 
-/* Buttons & Icons */
-.action-buttons { display: flex; gap: 8px; }
+.placeholder-text { 
+    color: #A0A5A1; 
+    font-style: italic; 
+}
+
+/* ==========================================================================
+   ICON BUTTONS & UTILITIES
+   ========================================================================== */
+.action-buttons { 
+    display: flex; 
+    gap: 8px; 
+}
+
 .btn-icon {
-    width: 40px; height: 40px;
+    width: 40px; 
+    height: 40px;
     border-radius: 50%;
     border: 1px solid var(--accent-sand);
     background: transparent;
     color: var(--text-muted);
-    display: flex; align-items: center; justify-content: center;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
     cursor: pointer;
     transition: 0.2s;
 }
+
 .btn-icon:hover {
     background: var(--accent-sand);
     color: var(--text-dark);
 }
+
 .btn-icon.danger:hover {
     background: #FFF0ED;
     border-color: #FCA5A5;
     color: #DC2626;
 }
 
-/* Spinner */
+.speak-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--surface-white);
+    color: var(--accent-terracotta);
+    border-color: var(--accent-terracotta);
+}
+
+.speak-btn:hover {
+    background: var(--accent-terracotta);
+    color: var(--surface-white);
+}
+
+.speak-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Loading Animation */
 .spinner {
-    width: 48px; height: 48px;
+    width: 48px; 
+    height: 48px;
     border: 3px solid var(--surface-white);
     border-top-color: var(--accent-terracotta);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    position: absolute; z-index: 20;
+    position: absolute; 
+    z-index: 20;
 }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-.hidden { display: none !important; }
 
+@keyframes spin { 
+    100% { transform: rotate(360deg); } 
+}
 
-/* === RESPONSIVE LAYOUTS === */
+.hidden { 
+    display: none !important; 
+}
 
-/* Tablet Optimization (Only stack in portrait mode) */
+/* ==========================================================================
+   RESPONSIVE LAYOUTS
+   ========================================================================== */
+
+/* 1. Tablet Optimization (Stack layout for portrait screens) */
 @media (max-width: 1024px) and (orientation: portrait) {
-    .dashboard-layout { grid-template-columns: 1fr; }
-    .app-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .tagline { text-align: left; }
+    .dashboard-layout { 
+        grid-template-columns: 1fr; 
+    }
+    .app-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 10px; 
+    }
+    .tagline { 
+        text-align: left; 
+    }
 }
 
-/* Strict Mobile Optimization (Portrait - No Scrolling Allowed) */
+/* 2. Strict Mobile Portrait Optimization */
 @media (max-width: 768px) and (orientation: portrait) {
     body {
         padding: 10px;
-        height: 100dvh; /* Enforce viewport height */
-        overflow: hidden; /* Strictly prevent vertical scrolling */
+        height: 100dvh; 
+        overflow: hidden; 
     }
 
     .app-wrapper {
@@ -420,7 +528,7 @@ h1, h2, h3 {
     }
 
     .tagline {
-        display: none; /* Hidden to preserve vertical space */
+        display: none; 
     }
 
     .dashboard-layout {
@@ -428,7 +536,7 @@ h1, h2, h3 {
         flex-direction: column;
         gap: 10px;
         flex: 1;
-        min-height: 0; /* Allows grid children to shrink instead of overflowing */
+        min-height: 0; 
     }
 
     .card {
@@ -449,13 +557,14 @@ h1, h2, h3 {
         justify-content: stretch;
     }
 
-    .card-header h2, .section-title {
+    .card-header h2, 
+    .section-title {
         font-size: 1.1rem;
         margin: 0;
     }
 
     .video-container {
-        height: 22vh; /* Responsive height based on view */
+        height: 22vh; 
         min-height: 120px;
         max-height: 180px;
         flex: none;
@@ -466,13 +575,14 @@ h1, h2, h3 {
         flex-wrap: nowrap;
     }
 
-    .elegant-select, .btn-primary {
+    .elegant-select, 
+    .btn-primary {
         padding: 8px 12px;
         font-size: 0.85rem;
         min-width: 0;
     }
 
-    /* Compress Detection Area */
+    /* Compressing detection UI to fit mobile viewports */
     .detection-wrapper {
         display: flex;
         flex-direction: row;
@@ -481,11 +591,11 @@ h1, h2, h3 {
     }
 
     .detection-wrapper .section-title {
-        display: none; /* Hidden to save space */
+        display: none; 
     }
 
     .gesture-display-box {
-        height: 60px; /* Fixed height for mobile */
+        height: 60px; 
         min-height: unset;
         padding: 5px 12px;
         margin-top: 0;
@@ -522,7 +632,6 @@ h1, h2, h3 {
         margin-bottom: 4px;
     }
 
-    /* Compress Translation Output Area */
     .translation-wrapper {
         flex: 1;
         min-height: 0;
@@ -550,34 +659,16 @@ h1, h2, h3 {
         display: flex;
         flex-direction: column;
         width: 100%;
-        min-width: 0; /* CRITICAL FIX: prevents flex horizontal blowouts */
+        min-width: 0; 
         flex: 1;
         min-height: 0;
     }
 
-    .lang-header {
-        margin-bottom: 4px;
-    }
-    
-    .speak-btn {
-        width: 28px;
-        height: 28px;
-    }
-    
-    .speak-btn svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    .btn-icon {
-        width: 34px; 
-        height: 34px;
-    }
-
-    .btn-icon svg {
-        width: 16px; 
-        height: 16px;
-    }
+    .lang-header { margin-bottom: 4px; }
+    .speak-btn { width: 28px; height: 28px; }
+    .speak-btn svg { width: 14px; height: 14px; }
+    .btn-icon { width: 34px; height: 34px; }
+    .btn-icon svg { width: 16px; height: 16px; }
 
     .status-pill {
         padding: 4px 10px;
@@ -585,8 +676,7 @@ h1, h2, h3 {
     }
 }
 
-/* === NEW: Mobile Landscape Optimization === */
-/* Forces the PC side-by-side layout, but aggressively squashes vertical space to prevent scrolling */
+/* 3. Mobile Landscape Optimization */
 @media (max-width: 950px) and (orientation: landscape) {
     body {
         padding: 8px;
@@ -594,14 +684,15 @@ h1, h2, h3 {
         overflow: hidden;
     }
 
+    /* Hide header to maximize functional real estate on extremely short screens */
     .app-header {
-        display: none; /* Hides the entire header to maximise camera and translation space */
+        display: none; 
     }
 
-    /* Force the PC side-by-side layout */
+    /* Enforce desktop-style split layout */
     .dashboard-layout {
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr; /* Same ratio as PC */
+        grid-template-columns: 1.1fr 0.9fr; 
         gap: 10px;
         flex: 1;
         min-height: 0;
@@ -612,12 +703,12 @@ h1, h2, h3 {
         gap: 8px;
     }
 
-    .card-header h2, .section-title {
+    .card-header h2, 
+    .section-title {
         font-size: 1rem;
         margin: 0;
     }
 
-    /* Compress Camera Area */
     .video-container {
         flex: 1;
         min-height: 80px;
@@ -628,13 +719,13 @@ h1, h2, h3 {
         flex-wrap: nowrap;
     }
 
-    .elegant-select, .btn-primary {
+    .elegant-select, 
+    .btn-primary {
         padding: 6px 10px;
         font-size: 0.8rem;
         min-width: 0;
     }
 
-    /* Compress Translation Side */
     .gesture-display-box {
         height: 50px;
         padding: 5px 10px;
@@ -645,44 +736,19 @@ h1, h2, h3 {
         font-size: clamp(0.9rem, 8cqw, 1.5rem);
     }
 
-    .confidence-tracker {
-        margin-top: 5px;
-    }
+    .confidence-tracker { margin-top: 5px; }
+    .confidence-header { margin-bottom: 2px; font-size: 0.75rem; }
+    .translation-wrapper { gap: 8px; }
+    .translation-header { padding-top: 0; }
+    .output-grid { gap: 8px; }
+    
+    .text-window { padding: 8px 12px; }
+    .text-window span { font-size: 0.85rem; }
 
-    .confidence-header {
-        margin-bottom: 2px;
-        font-size: 0.75rem;
-    }
+    .lang-header { margin-bottom: 2px; }
+    .lang-header label { font-size: 0.75rem; }
 
-    .translation-wrapper {
-        gap: 8px;
-    }
-
-    .translation-header {
-        padding-top: 0;
-    }
-
-    .output-grid {
-        gap: 8px;
-    }
-
-    .text-window {
-        padding: 8px 12px;
-    }
-
-    .text-window span {
-        font-size: 0.85rem;
-    }
-
-    .lang-header {
-        margin-bottom: 2px;
-    }
-
-    .lang-header label {
-        font-size: 0.75rem;
-    }
-
-    /* Shrink Buttons */
+    /* Compact icons for tight heights */
     .speak-btn { width: 24px; height: 24px; }
     .speak-btn svg { width: 12px; height: 12px; }
     .btn-icon { width: 30px; height: 30px; }

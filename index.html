@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="controls-container">
-                    <select id="device-select" class="elegant-select">
+                    <select id="device-select" class="elegant-select" aria-label="Select Camera Device">
                         <option value="" disabled selected>Select Camera Device</option>
                     </select>
                     <button id="start-btn" class="btn-primary" onclick="toggleCamera()">
@@ -87,20 +87,21 @@
                     <div class="translation-header">
                         <h2 class="section-title">Translation</h2>
                         <div class="action-buttons">
-                            <button id="backspace-btn" class="btn-icon" onclick="handleBackspace()" title="Backspace">
+                            <button id="backspace-btn" class="btn-icon" onclick="handleBackspace()" aria-label="Backspace" title="Backspace">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
                             </button>
-                            <button id="clear-btn" class="btn-icon danger" onclick="clearSentence()" title="Clear">
+                            <button id="clear-btn" class="btn-icon danger" onclick="clearSentence()" aria-label="Clear Translation" title="Clear">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                             </button>
                         </div>
                     </div>
                     
                     <div class="output-grid">
+                        
                         <div class="lang-box">
                             <div class="lang-header">
                                 <label>English</label>
-                                <button id="speak-en-btn" class="btn-icon speak-btn" onclick="speakText('en')" title="Speak English">
+                                <button id="speak-en-btn" class="btn-icon speak-btn" onclick="speakText('en')" aria-label="Speak English" title="Speak English">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                                 </button>
                             </div>
@@ -108,10 +109,11 @@
                                 <span class="placeholder-text">Translation will appear here...</span>
                             </div>
                         </div>
+
                         <div class="lang-box">
                             <div class="lang-header">
                                 <label>Bahasa Melayu</label>
-                                <button id="speak-ms-btn" class="btn-icon speak-btn" onclick="speakText('ms')" title="Speak Bahasa Melayu">
+                                <button id="speak-ms-btn" class="btn-icon speak-btn" onclick="speakText('ms')" aria-label="Speak Bahasa Melayu" title="Speak Bahasa Melayu">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                                 </button>
                             </div>
@@ -119,6 +121,7 @@
                                 <span class="placeholder-text">Terjemahan akan dipaparkan...</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
