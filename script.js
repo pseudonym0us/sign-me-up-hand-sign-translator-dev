@@ -206,37 +206,97 @@ function onResults(results) {
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         
-        for (const landmarks of results.multiHandLandmarks) {
-            drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
-            drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
-        }
+        // 1. EVALUATE ALL DETECTED HANDS FOR PROMINENCE (SIZE)
+        let evaluatedHands = [];
 
-        let dataAux = [];
-        let x_ = [];
-        let y_ = [];
-
-        for (const landmarks of results.multiHandLandmarks) {
+        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+            const landmarks = results.multiHandLandmarks[i];
+            const handedness = results.multiHandedness[i];
+            
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
             
             for (let lm of landmarks) {
-                x_.push(lm.x);
-                y_.push(lm.y);
+                if (lm.x < minX) minX = lm.x;
+                if (lm.x > maxX) maxX = lm.x;
+                if (lm.y < minY) minY = lm.y;
+                if (lm.y > maxY) maxY = lm.y;
+            }
+
+            // The bounding box area serves as our proxy for "closeness/prominence"
+            const area = (maxX - minX) * (maxY - minY);
+            
+            evaluatedHands.push({
+                landmarks: landmarks,
+                handedness: handedness,
+                area: area
+            });
+        }
+
+        // 2. SORT BY AREA DESCENDING AND TAKE THE TOP 2
+        evaluatedHands.sort((a, b) => b.area - a.area);
+        const topHands = evaluatedHands.slice(0, 2);
+        const numHands = topHands.length;
+
+        let dataAux = [];
+
+        // 3. APPLY LOGIC TO THE PROMINENT HANDS
+        // CASE 1: Single hand detected (Apply left hand flip for alphabet)
+        if (numHands === 1) {
+            const landmarks = topHands[0].landmarks;
+            const handednessLabel = topHands[0].handedness.label;
+            const isLeftHand = handednessLabel === "Left";
+
+            drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
+            drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
+
+            let x_ = landmarks.map(lm => lm.x);
+            let y_ = landmarks.map(lm => lm.y);
+            
+            let minX = Math.min(...x_);
+            let maxX = Math.max(...x_);
+            let minY = Math.min(...y_);
+
+            for (let lm of landmarks) {
+                let normalizedX = isLeftHand ? (maxX - lm.x) : (lm.x - minX);
+                dataAux.push(normalizedX);
+                dataAux.push(lm.y - minY);
+            }
+        } 
+        // CASE 2: Two hands detected (Preserve original spatial relationship)
+        else {
+            let x_ = [];
+            let y_ = [];
+
+            for (let i = 0; i < 2; i++) {
+                const landmarks = topHands[i].landmarks;
+                
+                drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#FFFFFF', lineWidth: 4});
+                drawLandmarks(ctx, landmarks, {color: '#3F4EEF', lineWidth: 2});
+
+                for (let lm of landmarks) {
+                    x_.push(lm.x);
+                    y_.push(lm.y);
+                }
             }
 
             let minX = Math.min(...x_);
             let minY = Math.min(...y_);
 
-            for (let lm of landmarks) {
-                dataAux.push(lm.x - minX);
-                dataAux.push(lm.y - minY);
+            for (let i = 0; i < 2; i++) {
+                const landmarks = topHands[i].landmarks;
+                for (let lm of landmarks) {
+                    dataAux.push(lm.x - minX);
+                    dataAux.push(lm.y - minY);
+                }
             }
         }
 
+        // Pad with zeros to match the expected 84 input features
         while (dataAux.length < 84) {
             dataAux.push(0.0);
         }
 
         const inputFeatures = dataAux.slice(0, 84);
-
         runInference(inputFeatures);
 
     } else {
